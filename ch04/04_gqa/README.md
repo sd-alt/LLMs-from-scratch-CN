@@ -1,38 +1,36 @@
-# Grouped-Query Attention (GQA)
+# 分组查询注意力（GQA）
 
-This bonus material illustrates the memory savings when using Grouped-Query Attention (GQA) over regular Multi-Head Attention (MHA).
+此奖励材料说明了使用分组查询注意力 (GQA) 相对于常规多头注意力 (MHA) 时所节省的内存。
 
-&nbsp;
-## Introduction
+ 
+## 简介
 
-Grouped-Query Attention (GQA) has become the new standard replacement for a more compute- and parameter-efficient alternative to Multi-Head Attention (MHA) in recent years. Note that it's not new and goes back to the 2023 [GQA: Training Generalized Multi-Query Transformer Models from Multi-Head Checkpoints](https://arxiv.org/abs/2305.13245). And even the larger variants in the good old Llama 2 series used it.
+近年来，分组查询注意力（GQA）已成为多头注意力（MHA）的计算和参数效率更高的新标准替代品。请注意，这并不是什么新鲜事，可以追溯到 2023 年 [GQA：从多头检查点](https://arxiv.org/abs/2305.13245) 训练通用多查询变压器模型。甚至老式 Llama 2 系列中的较大型号也使用了它。
 
-Here's a brief GQA summary. Unlike MHA, where each head also has its own set of keys and values, to reduce memory usage, GQA groups multiple heads to share the same key and value projections.
+以下是 GQA 的简短摘要。与 MHA 不同，MHA 中每个头也有自己的一组键和值，为了减少内存使用，GQA 将多个头分组以共享相同的键和值投影。
 
-For example, as further illustrated in the figure below, if there are 3 key-value groups and 6 attention heads, then heads 1 and 2 share one set of keys and values, while heads 3 and 4, as well as heads 5 and 6, share another, respectively.
+例如，如下图所示，如果有 3 个键值组和 6 个注意力头，则头 1 和 2 共享一组键和值，而头 3 和 4 以及头 5 和 6 分别共享另一组键和值。
 
-&nbsp;
+ 
 
 ![GQA](https://sebastianraschka.com/images/LLMs-from-scratch-images/bonus/gqa-memory/1.webp?1)
 
-&nbsp;
+ 
 
-This sharing of keys and values reduces the total number of key and value computations, which leads to lower memory usage and improved efficiency.
+这种键和值的共享减少了键和值计算的总数，从而降低了内存使用量并提高了效率。
 
-So, to summarize, the core idea behind GQA is to reduce the number of key and value heads by sharing them across multiple query heads. This (1) lowers the model's parameter count and (2) reduces the memory bandwidth usage for key and value tensors during inference since fewer keys and values need to be stored and retrieved from the KV cache.
+因此，总而言之，GQA 背后的核心思想是通过在多个查询头之间共享键和值头来减少它们的数量。这 (1) 减少了模型的参数数量，(2) 减少了推理过程中键和值张量的内存带宽使用，因为需要在 KV 缓存中存储和检索的键和值更少。
 
-While GQA is mainly a computational-efficiency workaround for MHA, ablation studies (such as those in the [original GQA paper](https://arxiv.org/abs/2305.13245) and the [Llama 2 paper](https://arxiv.org/abs/2307.09288)) show it performs comparably to standard MHA in terms of LLM modeling performance.
+虽然 GQA 主要是 MHA 的计算效率解决方法，但消融研究（例如 [原始 GQA 论文](https://arxiv.org/abs/2305.13245) 和 [Llama 2 论文](https://arxiv.org/abs/2307.09288) 中的研究）表明，它在 LLM 建模性能方面的表现与标准 MHA 相当。
 
-However, this assumes that the number of key-value groups is chosen carefully. In the extreme case where all attention heads share a single key-value group, known as multi-query attention, the memory usage decreases even more drastically but modeling performance can suffer. (And, on the other extreme, if we set the number of key-value groups equal to the number of query heads, we are back at standard multi-head attention.)
+然而，这假设键值组的数量是经过仔细选择的。在所有注意力头共享一个键值组（称为多查询注意力）的极端情况下，内存使用量会大幅减少，但建模性能可能会受到影响。 （并且，在另一个极端，如果我们将键值组的数量设置为等于查询头的数量，我们又回到了标准的多头注意力。）
 
-&nbsp;
-## GQA Memory Savings
+ 
+## GQA 内存节省内存的节省主要体现在KV存储上。我们可以通过以下公式计算KV存储大小：
 
-The memory savings are mostly reflected in the KV storage. We can compute the KV storage size with the following formula:
+字节 ≈ batch_size × seqlen × (embed_dim / n_heads) × n_layers × 2 (K,V) × bytes_per_elem × n_kv_heads
 
-bytes ≈ batch_size × seqlen × (embed_dim / n_heads) × n_layers × 2 (K,V) × bytes_per_elem × n_kv_heads
-
-You can use the [memory_estimator_gqa.py](memory_estimator_gqa.py) script in this folder to apply this for different model configs to see how much memory you can save by using GQA over MHA:
+您可以使用此文件夹中的 [memory_estimator_gqa.py](memory_estimator_gqa.py) 脚本将此脚本应用于不同的模型配置，以查看通过使用 GQA 而非 MHA 可以节省多少内存：
 
 ```bash
 ➜ uv run memory_estimator_gqa.py \
@@ -57,26 +55,26 @@ Ratio (MHA / GQA)   : 4.00x
 Savings (GQA vs MHA): 75.00%
 ```
 
-The savings when using GQA over MHA are further shown in the plot below for different key-value group sizes as a function of the context length:
+下图进一步显示了使用 GQA 而非 MHA 时所节省的成本，其中不同的键值组大小与上下文长度有关：
 
-&nbsp;
+ 
 
 <img src="https://sebastianraschka.com/images/LLMs-from-scratch-images/bonus/gqa-memory/3.webp?4" alt="GQA" width="500px" />
 
-&nbsp;
+ 
 
-You can reproduce the plot via `uv run plot_memory_estimates_gqa.py`.
+您可以通过 `uv run plot_memory_estimates_gqa.py` 重现该图。
 
-&nbsp;
-## GQA Code Examples
+ 
+## GQA 代码示例
 
-The [gpt_with_kv_mha.py](gpt_with_kv_mha.py) and [gpt_with_kv_gqa.py](gpt_with_kv_gqa.py) scripts in this folder provide hands-on examples for comparing the MHA and GQA memory usage in the context of a GPT model implementation.
+此文件夹中的 [gpt_with_kv_mha.py](gpt_with_kv_mha.py) 和 [gpt_with_kv_gqa.py](gpt_with_kv_gqa.py) 脚本提供了在 GPT 模型实现的上下文中比较 MHA 和 GQA 内存使用情况的实践示例。
 
-Note that GQA is also used in the [Llama 3](../../ch05/07_gpt_to_llama), [Gemma 3](../../ch05/12_gemma3), and [Qwen3](../../ch05/11_qwen3) bonus materials. However, for simplicity, the code scripts in this folder modify the GPT architecture, which traditionally didn't use GQA.
+请注意，GQA 也用于 [Llama 3](../../ch05/07_gpt_to_llama)、[Gemma 3](../../ch05/12_gemma3) 和 [Qwen3](../../ch05/11_qwen3) 奖励材料中。但是，为了简单起见，此文件夹中的代码脚本修改了传统上不使用 GQA 的 GPT 架构。
 
-Note that the model is not trained and thus generates nonsensical text. However, you can use it as a drop-in replacement for the standard GPT model in chapters 5-7 and train it.
+请注意，该模型未经训练，因此会生成无意义的文本。但是，您可以使用它作为第 5-7 章中标准 GPT 模型的直接替代品并对其进行训练。
 
-Also, this implementation uses the KV cache explained in [another bonus section](../03_kv-cache) so the memory savings are more pronounced.
+此外，此实现使用 [另一个奖励部分](../03_kv-cache) 中解释的 KV 缓存，因此内存节省更加明显。
 
 ```bash
 uv run gpt_with_kv_mha.py \
@@ -105,7 +103,7 @@ Time: 516.33 sec
 Max memory allocated: 0.63 GB
 ```
 
-The reason why we are not seeing such a big saving as in the plots above is 2-fold:
+我们没有看到上图中如此大的节省的原因有两个：
 
-1. I use a smaller configuration to have the model finish the generation in a reasonable time.
-2. More importantly, we are looking at the whole model here, not just the attention mechanism; the fully-connected layers in the model take up most of the memory (but this is a topic for a separate analysis).
+1.我使用较小的配置让模型在合理的时间内完成生成。
+2.更重要的是，我们在这里看的是整个模型，而不仅仅是注意力机制；模型中的全连接层占用了大部分内存（但这是一个单独分析的主题）。

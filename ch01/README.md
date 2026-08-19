@@ -1,33 +1,32 @@
-# Chapter 1: Understanding Large Language Models
+# 第 1 章：理解大型语言模型
 
 
-&nbsp;
-## Main Chapter Code
+ 
+## 主要章节代码
 
-There is no code in this chapter.
-
-
-&nbsp;
-## Bonus Materials
-
-[Recommendations for Getting the Most Out of This Book](https://sebastianraschka.com/blog/2025/reading-books.html)
+本章没有代码。
 
 
+ 
+## 奖励材料
 
-In the video below, I share my personal approach to setting up a Python environment on my computer:
+[充分利用本书的建议](https://sebastianraschka.com/blog/2025/reading-books.html)
 
-<br>
-<br>
 
-[![Link to the video](https://img.youtube.com/vi/yAcWnfsZhzo/0.jpg)](https://www.youtube.com/watch?v=yAcWnfsZhzo)
+
+在下面的视频中，我分享了我个人在计算机上设置Python环境的方法：
 
 <br>
 <br>
 
-As an optional bonus, the following video tutorial provides an overview of the LLM development lifecycle covered in this book:
+[![视频链接](https://img.youtube.com/vi/yAcWnfsZhzo/0.jpg)](https://www.youtube.com/watch?v=yAcWnfsZhzo)
 
 <br>
 <br>
 
-[![Link to the video](https://img.youtube.com/vi/kPGTx4wcm_w/0.jpg)](https://www.youtube.com/watch?v=kPGTx4wcm_w)
+作为可选的奖励，以下视频教程概述了本书中涵盖的 LLM 开发生命周期：
 
+<br>
+<br>
+
+[![视频链接](https://img.youtube.com/vi/kPGTx4wcm_w/0.jpg)](https://www.youtube.com/watch?v=kPGTx4wcm_w)

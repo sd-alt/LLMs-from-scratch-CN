@@ -1,11 +1,11 @@
-# Appendix A: Introduction to PyTorch
+# 附录 A：PyTorch 简介
 
-&nbsp;
-## Main Chapter Code
+ 
+## 主要章节代码
 
-- [01_main-chapter-code](01_main-chapter-code) contains the main chapter code
+- [01_main-chapter-code](01_main-chapter-code) 包含主要章节代码
 
-&nbsp;
-## Bonus Materials
+ 
+## 奖励材料
 
-- [02_setup-recommendations](02_setup-recommendations) contains Python installation and setup recommendations.
+- [02_setup-recommendations](02_setup-recommendations) 包含 Python 安装和设置建议。

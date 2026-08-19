@@ -1,3 +1,3 @@
-# Extending the Tiktoken BPE Tokenizer with New Tokens
+# 使用新代币扩展 Tiktoken BPE Tokenizer
 
-- [extend-tiktoken.ipynb](extend-tiktoken.ipynb) contains optional (bonus) code to explain how we can add special tokens to a tokenizer implemented via `tiktoken` and how to update the LLM accordingly
+- [extends-tiktoken.ipynb](extend-tiktoken.ipynb) 包含可选（奖励）代码，用于解释我们如何向通过 `tiktoken` 实现的标记生成器添加特殊标记以及如何相应地更新 LLM

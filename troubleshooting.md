@@ -1,70 +1,68 @@
-# Troubleshooting Guide
+# 故障排除指南
 
-This page collects common issues and setup tips encountered while working through the book.
+此页面收集了在阅读本书时遇到的常见问题和设置技巧。
 
-&nbsp;
-## Notebook Image Loading Issues
+ 
+## 笔记本图像加载问题
 
-The chapter notebooks use Markdown image links hosted at `https://sebastianraschka.com/images/LLMs-from-scratch-images/...`. This keeps the repository download size manageable, but it also means the images depend on the image host and your network connection.
+章节笔记本使用 `https://sebastianraschka.com/images/LLMs-from-scratch-images/...` 上托管的 Markdown 图像链接。这使得存储库下载大小易于管理，但这也意味着图像取决于图像主机和网络连接。
 
-If images in the `.ipynb` notebooks do not render:
+如果 `.ipynb` 笔记本中的图像未呈现：
 
-- Open one of the image URLs directly in your browser, for example [https://sebastianraschka.com/images/LLMs-from-scratch-images/ch02_compressed/02.webp](https://sebastianraschka.com/images/LLMs-from-scratch-images/ch02_compressed/02.webp).
-- If the URL does not load in the browser either, the issue is likely a temporary website, DNS, VPN, proxy, firewall, or local network problem rather than a notebook problem.
-- I recommend double-checking the URL on a different device or network (e.g., try opening the image on your phone); if the image loads fine on your phone, it likely points to a VPN or firewall issue on your computer.
-- If the images also don't load on your phone, please feel  free to open GitHub [Issue](https://github.com/rasbt/LLMs-from-scratch/issues) to help me debug this further.
+- 直接在浏览器中打开图像 URL 之一，例如 [https://sebastianraschka.com/images/LLMs-from-scratch-images/ch02_compressed/02.webp](https://sebastianraschka.com/images/LLMs-from-scratch-images/ch02_compressed/02.webp)。
+- 如果 URL 也无法在浏览器中加载，则问题可能是临时网站、DNS、VPN、代理、防火墙或本地网络问题，而不是笔记本电脑问题。
+- 我建议在不同的设备或网络上仔细检查 URL（例如，尝试在手机上打开图像）；如果图像在您的手机上加载正常，则可能表明您的计算机上存在 VPN 或防火墙问题。
+- 如果图像也无法在您的手机上加载，请随时打开 GitHub [Issue](https://github.com/rasbt/LLMs-from-scratch/issues) 来帮助我进一步调试。
 
-&nbsp;
-## Keeping Personal Notebook Changes While Updating the Repository
+ 
+## 更新存储库时保留个人笔记本更改
 
-If you want to modify notebooks while also receiving repository updates, fork the repository first, then clone your fork. The main book notebooks are kept in sync with the printed book and are generally not changed, except for critical fixes. Most repository updates add bonus material instead.
+如果您想在修改笔记本的同时接收存储库更新，请首先分叉存储库，然后克隆您的分叉。主要书籍笔记本与印刷书籍保持同步，通常不会更改，除非进行了关键修复。大多数存储库更新都会添加奖励材料。
 
-Notebook files are JSON files, so Git diffs and merge conflicts can be hard to read. To avoid unnecessary conflicts, I recommend keeping your experiments separate from the tracked book notebooks:
+笔记本文件是 JSON 文件，因此 Git 差异和合并冲突可能难以阅读。为了避免不必要的冲突，我建议将您的实验与跟踪的笔记本分开：
 
-- Copy a notebook before changing it, for example from `ch02.ipynb` to `ch02_experiments.ipynb`.
-- Keep your scratch notebooks in a separate folder or on your own branch.
-- Fetch updates from the original repository with an `upstream` remote, then merge or rebase only when you need those updates.
+- 在更改之前复制笔记本，例如从 `ch02.ipynb` 到 `ch02_experiments.ipynb`。
+- 将您的草稿笔记本保存在单独的文件夹或您自己的分支中。
+- 使用 `upstream` 远程从原始存储库获取更新，然后仅在需要这些更新时合并或变基。
 
-To create a fork and clone it:
+要创建一个分叉并克隆它：
 
-1. Open [https://github.com/rasbt/LLMs-from-scratch](https://github.com/rasbt/LLMs-from-scratch).
-2. Click the **Fork** button in the upper-right corner on GitHub.
-3. Clone your fork, replacing `YOUR-USERNAME` with your GitHub username:
+1. 打开[https://github.com/rasbt/LLMs-from-scratch](https://github.com/rasbt/LLMs-from-scratch)。
+2. 单击 GitHub 右上角的 **Fork** 按钮。
+3. 克隆您的 fork，将 `YOUR-USERNAME` 替换为您的 GitHub 用户名：
 
 ```bash
 git clone https://github.com/YOUR-USERNAME/LLMs-from-scratch.git
 cd LLMs-from-scratch
 ```
 
-Then add the original repository as `upstream` so you can fetch future updates:
+然后将原始存储库添加为 `upstream`，以便您可以获取未来的更新：
 
 ```bash
 git remote add upstream https://github.com/rasbt/LLMs-from-scratch.git
 git fetch upstream
 git merge upstream/main
-```
-
-If you do need to merge edited notebooks, consider installing [`nbdime`](https://nbdime.readthedocs.io/) to get notebook-aware diffs and merge tools:
+```如果您确实需要合并已编辑的笔记本，请考虑安装 [`nbdime`](https://nbdime.readthedocs.io/) 以获得笔记本感知的差异和合并工具：
 
 ```bash
 pip install nbdime
 nbdime config-git --enable
 ```
 
-For more context, see [#1015](https://github.com/rasbt/LLMs-from-scratch/issues/1015).
+有关更多上下文，请参阅 [#1015](https://github.com/rasbt/LLMs-from-scratch/issues/1015)。
 
-&nbsp;
-## Apple Silicon and MPS Support
+ 
+## Apple Silicon 和 MPS 支持
 
-Some notebooks and scripts use `cuda` when available and otherwise fall back to `cpu`, without selecting Apple's `mps` backend. This omission of `mps` support is intentional in many places because earlier PyTorch/MPS versions produced unstable or different results in several examples, especially during training and finetuning.
+某些笔记本和脚本在可用时使用 `cuda`，否则回退到 `cpu`，而不选择 Apple 的 `mps` 后端。在许多地方，`mps` 支持的省略是有意的，因为早期的 PyTorch/MPS 版本在几个示例中产生了不稳定或不同的结果，特别是在训练和微调期间。
 
-If you are using an Apple Silicon Mac and see diverging losses, sharp loss spikes, poor generated text, or results that do not match the book, rerun the example on `cpu` first. For faster training with book-matching behavior, I recommend using `cuda` on a local NVIDIA GPU or a cloud GPU.
+如果您使用的是 Apple Silicon Mac，并看到不同的损失、急剧的损失峰值、生成的文本质量不佳或结果与本书不匹配，请首先在 `cpu` 上重新运行示例。为了通过书籍匹配行为进行更快的训练，我建议在本地 NVIDIA GPU 或云 GPU 上使用 `cuda`。
 
-Newer PyTorch versions may improve MPS behavior, and you can experiment with `mps` locally if you validate the results carefully. However, if you add `mps` support to a script yourself, keep in mind that CUDA-specific options such as `pin_memory=True`, `torch.compile`, and DDP/multi-GPU code may need separate guards.
+较新的 PyTorch 版本可能会改进 MPS 行为，如果仔细验证结果，您可以在本地尝试 `mps`。但是，如果您自己将 `mps` 支持添加到脚本中，请记住特定于 CUDA 的选项（例如 `pin_memory=True`、`torch.compile` 和 DDP/多 GPU 代码）可能需要单独的防护。
 
-For more context, see [#977](https://github.com/rasbt/LLMs-from-scratch/issues/977), [#625](https://github.com/rasbt/LLMs-from-scratch/discussions/625), [#644](https://github.com/rasbt/LLMs-from-scratch/discussions/644), [#442](https://github.com/rasbt/LLMs-from-scratch/discussions/442), and [#846](https://github.com/rasbt/LLMs-from-scratch/issues/846).
+有关更多上下文，请参阅 [#977](https://github.com/rasbt/LLMs-from-scratch/issues/977)、[#625](https://github.com/rasbt/LLMs-from-scratch/discussions/625)、[#644](https://github.com/rasbt/LLMs-from-scratch/discussions/644)、[#442](https://github.com/rasbt/LLMs-from-scratch/discussions/442) 和 [#846](https://github.com/rasbt/LLMs-from-scratch/issues/846)。
 
-&nbsp;
-## Other Issues
+ 
+## 其他问题
 
-For other issues, please feel free to open a new GitHub [Issue](https://github.com/rasbt/LLMs-from-scratch/issues).
+对于其他问题，请随时打开新的 GitHub [Issue](https://github.com/rasbt/LLMs-from-scratch/issues)。

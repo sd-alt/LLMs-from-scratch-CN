@@ -1,85 +1,83 @@
-# DeepSeek Sparse Attention (DSA)
+# DeepSeek 稀疏注意力 (DSA)
 
-This bonus material implements the DeepSeek Sparse Attention (DSA) mechanism introduced in [DeepSeek-V3.2](https://huggingface.co/deepseek-ai/DeepSeek-V3.2) and first published in the experimental [DeepSeek-V3.2-Exp](https://huggingface.co/deepseek-ai/DeepSeek-V3.2-Exp) release.
+该奖励材料实现了 [DeepSeek-V3.2](https://huggingface.co/deepseek-ai/DeepSeek-V3.2) 中引入的 DeepSeek 稀疏注意力 (DSA) 机制，并首次在实验性 [DeepSeek-V3.2-Exp](https://huggingface.co/deepseek-ai/DeepSeek-V3.2-Exp) 版本中发布。
 
-The overview below follows the DSA discussion in [From DeepSeek V3 to V3.2: Architecture, Sparse Attention, and RL Updates](https://magazine.sebastianraschka.com/p/technical-deepseek).
+以下概述遵循 [从 DeepSeek V3 到 V3.2：架构、稀疏注意力和 RL 更新](https://magazine.sebastianraschka.com/p/technical-deepseek) 中的 DSA 讨论。
 
-&nbsp;
-## Introduction
+ 
+## 简介
 
-Standard causal self-attention attends to all previous tokens for each query, yielding O(L²) compute and O(L) KV-cache growth with sequence length L.
+标准因果自注意力关注每个查询的所有先前标记，产生 O(L²) 计算和 O(L) KV 缓存增长（序列长度为 L）。
 
-[Sliding Window Attention (SWA)](../06_swa) already showed that restricting attention to a fixed local window substantially reduces this cost. In SWA, each query token attends only to a local span of nearby previous tokens.
+[滑动窗口注意力（SWA）](../06_swa) 已经表明，将注意力限制在固定的本地窗口上可以大大降低这种成本。在 SWA 中，每个查询令牌仅关注附近先前令牌的本地范围。
 
-&nbsp;
+ 
 
 <img src="https://sebastianraschka.com/images/blog/2025/technical-deepseek/09.png" alt="Sliding window attention" width="800px" />
 
-*Figure 1. Sliding-window attention restricts each query token to a fixed local context window.*
+*图 1. 滑动窗口注意力将每个查询标记限制到固定的本地上下文窗口。*
 
-&nbsp;
+ 
 
-DSA uses the same broad idea of attending to only a subset of previous tokens. However, it replaces the fixed window with a learned selection mechanism. For each query token, the model scores candidate past tokens and keeps only the most relevant ones.
+DSA 使用相同的广泛思想，即仅关注先前令牌的子集。然而，它用学习的选择机制代替了固定窗口。对于每个查询标记，该模型会对候选过去的标记进行评分，并仅保留最相关的标记。
 
-&nbsp;
+ 
 
 <img src="https://sebastianraschka.com/images/blog/2025/technical-deepseek/10.png" alt="DeepSeek Sparse Attention selected-token pattern" width="800px" />
 
-*Figure 2. DeepSeek Sparse Attention selects a learned subset of past tokens for each query token.*
+*图 2.DeepSeek 稀疏注意力为每个查询标记选择过去标记的学习子集。*
 
-&nbsp;
+ 
 
-### Architecture overview
+### 架构概述
 
-DSA adds two components on top of standard attention.
+DSA 在标准注意力的基础上添加了两个组件。
 
-**1. Lightning Indexer**
+**1.闪电索引器**
 
-For each query token $t$ and every candidate past token $s$, the indexer computes a scalar relevance score. This implementation makes the scale factors from the reference code explicit:
+对于每个查询标记 $t$ 和每个候选过去标记 $s$，索引器计算标量相关性得分。此实现使参考代码中的比例因子变得明确：
 
 $$I_{t,s} = \sum_{j=1}^{H_I} \frac{w_{t,j}}{\sqrt{H_I}} \cdot \text{ReLU}\left(\frac{q_{t,j} \cdot k_s}{\sqrt{d_I}}\right)$$
 
-where:
-- $H_I$ is the number of lightweight index heads,
-- $q_{t,j}$ is the indexer query vector for token $t$ and head $j$,
-- $k_s$ is a shared indexer key vector for past token $s$,
-- $w_{t,j}$ is a learned per-head gate scaled by $1 / \sqrt{H_I}$.
+其中：
+- $H_I$ 是轻量级索引头的数量，
+- $q_{t,j}$ 是令牌 $t$ 和头 $j$ 的索引器查询向量，
+- $k_s$ 是过去令牌 $s$ 的共享索引器键向量，
+- $w_{t,j}$ 是由 $1 / \sqrt{H_I}$ 缩放的学习的每头门。
 
-The ReLU zeroes out negative dot-product contributions, and the gated sum aggregates across index heads into a single relevance score per past token.
+ReLU 将负点积贡献归零，并且各个索引头的门控总和汇总为每个过去标记的单个相关性得分。
 
-In the full DeepSeek model, the indexer works with the compressed token representations from Multi-Head Latent Attention (MLA). This folder keeps the GPT implementation simpler and computes the indexer queries and keys from the regular hidden states.
+在完整的 DeepSeek 模型中，索引器使用来自多头潜在注意力 (MLA) 的压缩标记表示。该文件夹使 GPT 实现更加简单，并根据常规隐藏状态计算索引器查询和键。
 
-**2. Token Selector**
+**2.代币选择器**计算完所有索引器分数后，仅保留前 K 个最高分数位置。所有其他位置都在标准 softmax *之前*被屏蔽为 −∞，因此该模型实际上只关注 $k \ll L$ 令牌。
 
-After computing all indexer scores, only the top-K highest-scoring positions are kept. All other positions are masked to −∞ *before* the standard softmax, so the model effectively attends to only $k \ll L$ tokens.
+索引器中的 ReLU 并不是最终稀疏性的来源。由于分数是在多个索引头上求和的，因此大多数最终分数仍然可以是非零的。令牌选择器通过仅保留前 K 个位置来创建稀疏模式。
 
-The ReLU in the indexer is not where the final sparsity comes from. Since the scores are summed over multiple index heads, most final scores can still be nonzero. The token selector creates the sparse pattern by keeping only the top-K positions.
+在融合生产实现中，这可以将注意力计算从 O(L²) 降低到 O(L·k)。这里的实现保留了标准的密集注意力得分矩阵，并在 softmax 之前应用 DSA 选择的 top-K 掩码。这使得选择逻辑易于检查，但它不提供融合内核计算节省。
 
-In a fused production implementation, this can lower attention compute from O(L²) to O(L·k). The implementation here keeps the standard dense attention score matrix and applies the DSA-selected top-K mask before softmax. This makes the selection logic easy to inspect, but it does not provide the fused-kernel compute savings.
+下图总结了流程。闪电索引器对候选标记进行评分，选择器保留前 K 个位置，并且生成的掩码限制通常的注意力 softmax。
 
-The figure below summarizes the flow. The lightning indexer scores candidate tokens, the selector keeps top-K positions, and the resulting mask restricts the usual attention softmax.
-
-&nbsp;
+ 
 
 <img src="https://sebastianraschka.com/images/blog/2025/technical-deepseek/11.png" alt="DeepSeek Sparse Attention flowchart" width="700px" />
 
-*Figure 3. DSA first scores candidate tokens, then keeps the top-K tokens for the final attention mask.*
+*图 3.DSA 首先对候选标记进行评分，然后保留前 K 个标记作为最终的注意力掩码。*
 
-&nbsp;
-## Implementation
+ 
+## 实施
 
-`gpt_with_kv_dsa.py` provides:
+`gpt_with_kv_dsa.py` 提供：
 
-| Class | Description |
+|班级 |描述 |
 |---|---|
-| `LightningIndexer` | Lightweight multi-head scorer for past-token relevance. |
-| `MultiHeadAttentionWithDSA` | Standard MHA with DSA sparse masking + optional KV cache. |
-| `GPTModel` | GPT-style model swapping in `MultiHeadAttentionWithDSA`. |
+| `LightningIndexer` |用于过去标记相关性的轻量级多头记分器。 |
+| `MultiHeadAttentionWithDSA` |带 DSA 稀疏掩码的标准 MHA + 可选 KV 缓存。 |
+| `GPTModel` | `MultiHeadAttentionWithDSA` 中的 GPT 样式模型交换。 |
 
-The implementation follows the style of the other bonus material in this repository and can be run as a standalone script. It is meant to make the DSA mechanism inspectable in a small GPT-style model. It does not implement DeepSeek's full MLA stack, fused sparse kernels, or deployment-specific optimizations.
+该实现遵循此存储库中其他奖励材料的风格，并且可以作为独立脚本运行。它的目的是使 DSA 机制可以在小型 GPT 样式模型中进行检查。它没有实现 DeepSeek 的完整 MLA 堆栈、融合稀疏内核或特定于部署的优化。
 
-&nbsp;
-## Usage
+ 
+## 用法
 
 ```bash
 uv run gpt_with_kv_dsa.py \
@@ -92,32 +90,30 @@ uv run gpt_with_kv_dsa.py \
   --topk 64
 ```
 
-Key arguments:
+关键论点：
 
-| Argument | Default | Description |
+|论证|默认|描述 |
 |---|---|---|
-| `--index_n_heads` | 4 | Number of lightweight indexer heads (H_I). |
-| `--index_head_dim` | 64 | Dimension of each indexer head. |
-| `--topk` | 64 | Number of tokens each query attends to (k). Capped at sequence length for short sequences. |
+| `--index_n_heads` | 4 |轻型分度器头的数量 (H_I)。 |
+| `--index_head_dim` | 64 | 64每个分度头的尺寸。 |
+| `--topk` | 64 | 64每个查询涉及的令牌数量 (k)。对于短序列，以序列长度为上限。 |
 
-&nbsp;
-## Relation to DeepSeek V3.2
+ 
+## 与 DeepSeek V3.2 的关系完整的 DeepSeek-V3.2 模型使用多头潜在注意力（MLA，请参阅 [../05_mla](../05_mla)）和 DSA，并且索引器查询源自共享的压缩潜在表示而不是原始输入。 DeepSeek-V3.2 使用与 DeepSeek-V3.2-Exp 相同的架构，其中首次引入并测试了 DSA。
 
-The full-scale DeepSeek-V3.2 model uses Multi-Head Latent Attention (MLA, see [../05_mla](../05_mla)) alongside DSA, and the indexer queries are derived from the shared compressed latent representation rather than the raw input. DeepSeek-V3.2 uses the same architecture as DeepSeek-V3.2-Exp, where DSA was first introduced and tested.
+这里再现了关键选择的想法。一个廉价的学习点积评分器将每个查询限制在注意力 softmax 之前最相关的标记。
 
-The key selection idea is reproduced here. A cheap learned dot-product scorer limits each query to the most relevant tokens before the attention softmax.
+下面报告的推理成本比较是说明 DSA 在长上下文部署中为何重要的有用背景。节省的成本取决于生产内核和服务基础设施，因此不应将此数字视为此文件夹中教学实施的基准。
 
-The reported inference-cost comparison below is useful context for why DSA matters in long-context deployments. The savings depend on production kernels and serving infrastructure, so this figure should not be read as a benchmark for the teaching implementation in this folder.
-
-&nbsp;
+ 
 
 <img src="https://sebastianraschka.com/images/blog/2025/technical-deepseek/19.png" alt="Inference cost comparison for DeepSeek Sparse Attention" width="800px" />
 
-*Figure 4. DeepSeek's reported inference-cost savings from DSA in long-context serving, from the [DeepSeek V3.2 technical report](https://huggingface.co/deepseek-ai/DeepSeek-V3.2/resolve/main/assets/paper.pdf).*
+*图 4. DeepSeek 报告的 DSA 在长上下文服务中节省的推理成本，来自 [DeepSeek V3.2 技术报告](https://huggingface.co/deepseek-ai/DeepSeek-V3.2/resolve/main/assets/paper.pdf)。*
 
-&nbsp;
-## References
+ 
+## 参考文献
 
-- DeepSeek V3.2 technical report: https://huggingface.co/deepseek-ai/DeepSeek-V3.2/resolve/main/assets/paper.pdf
-- DeepSeek V3.2-Exp model card & reference code: https://huggingface.co/deepseek-ai/DeepSeek-V3.2-Exp
-- Sebastian Raschka's "From DeepSeek V3 to V3.2: Architecture, Sparse Attention, and RL Updates": https://magazine.sebastianraschka.com/p/technical-deepseek
+- DeepSeek V3.2技术报告：https://huggingface.co/deepseek-ai/DeepSeek-V3.2/resolve/main/assets/paper.pdf
+- DeepSeek V3.2-Exp 模型卡和参考代码：https://huggingface.co/deepseek-ai/DeepSeek-V3.2-Exp
+- Sebastian Raschka 的“从 DeepSeek V3 到 V3.2：架构、稀疏注意力和 RL 更新”：https://magazine.sebastianraschka.com/p/technical-deepseek

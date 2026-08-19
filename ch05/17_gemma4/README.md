@@ -1,5 +1,5 @@
-# Gemma 4
+# 杰玛 4
 
-This directory contains a standalone, text-only Gemma 4 notebook built from the Gemma 3 reference notebook and adapted for the dense `google/gemma-4-E2B` and `google/gemma-4-E4B` checkpoints.
+该目录包含一个独立的纯文本 Gemma 4 笔记本，它是根据 Gemma 3 参考笔记本构建的，并针对密集的 `google/gemma-4-E2B` 和 `google/gemma-4-E4B` 检查点进行了调整。
 
-- [standalone-gemma4.ipynb](./standalone-gemma4.ipynb) implements the shared Gemma 4 dense architecture in pure PyTorch and switches between the E2B and E4B reference configs via `CHOOSE_MODEL`.
+- [独立-gemma4.ipynb](./standalone-gemma4.ipynb)在纯PyTorch中实现共享Gemma 4密集架构，并通过`CHOOSE_MODEL`在E2B和E4B参考配置之间切换。

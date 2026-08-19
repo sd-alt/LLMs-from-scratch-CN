@@ -1,5 +1,5 @@
-# Appendix B: References and Further Reading
+# 附录 B：参考资料和延伸阅读
 
 
 
-- No code in this appendix
+- 本附录中没有代码

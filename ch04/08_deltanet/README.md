@@ -1,34 +1,32 @@
-# Gated DeltaNet for Linear Attention
+# 用于线性注意力的门控 DeltaNet
 
-Recently, [Qwen3-Next](https://qwen.ai/blog?id=4074cca80393150c248e508aa62983f9cb7d27cd&from=research.latest-advancements-list) and [Kimi Linear](https://arxiv.org/abs/2510.26692) proposed hybrid transformers that implement alternatives to the attention mechanism that scale linearly instead of quadratically with respect to the context length.
+最近，[Qwen3-Next](https://qwen.ai/blog?id=4074cca80393150c248e508aa62983f9cb7d27cd&from=research.latest-advancements-list) 和 [Kimi Linear](https://arxiv.org/abs/2510.26692) 提出了混合变压器，该变压器实现了注意力机制的替代方案，该机制相对于上下文长度线性而不是二次缩放。
 
-Both Qwen3-Next and Kimi Linear use a 3:1 ratio, meaning for every three transformer blocks employing the linear Gated DeltaNet variant, there’s one block that uses full attention, as shown in the figure below.
+Qwen3-Next 和 Kimi Linear 都使用 3:1 的比率，这意味着每三个使用线性 Gated DeltaNet 变体的 Transformer 块，就有一个块使用了完全注意力，如下图所示。
 
 <img src="https://sebastianraschka.com/images/LLMs-from-scratch-images/bonus/gated_deltanet/01.webp" alt="Qwen3-Next versus Kimi Linear">
 
 
 
-&nbsp;
+ 
 
-## Introduction and Overview
+## 介绍和概述
 
-Gated DeltaNet is a linear attention variant with inspiration from recurrent neural networks, including a gating mechanism from the [Gated Delta Networks: Improving Mamba2 with Delta Rule](https://arxiv.org/abs/2412.06464) paper. In a sense, Gated DeltaNet is a DeltaNet with Mamba-style gating, and DeltaNet is a linear attention mechanism.
+门控 DeltaNet 是一种线性注意力变体，其灵感来自循环神经网络，包括 [门控 Delta 网络：使用 Delta 规则改进 Mamba2](https://arxiv.org/abs/2412.06464) 论文中的门控机制。从某种意义上说，Gated DeltaNet 是具有 Mamba 式门控的 DeltaNet，DeltaNet 是一种线性注意力机制。
 
-Kimi Linear modifies the linear attention mechanism of Qwen3-Next by the Kimi Delta Attention (KDA) mechanism, which is essentially a refinement of Gated DeltaNet. Whereas Qwen3-Next applies a scalar gate (one value per attention head) to control the memory decay rate, Kimi Linear replaces it with a channel-wise gating for each feature dimension. According to the authors, this gives more control over the memory, and this, in turn, improves long-context reasoning.
+Kimi Linear通过Kimi Delta Attention（KDA）机制修改了Qwen3-Next的线性注意力机制，本质上是Gated DeltaNet的细化。 Qwen3-Next 应用标量门（每个注意力头一个值）来控制记忆衰减率，而 Kimi Linear 将其替换为每个特征维度的通道门控。作者表示，这可以更好地控制记忆，进而改善长上下文推理。
 
-In addition, for the full attention layers, Kimi Linear replaces Qwen3-Next’s gated attention layers (which are essentially standard multi-head attention layers with output gating) with Multi-Head Latent Attention (MLA). This is the same MLA mechanism we discussed earlier in the DeepSeek V3/R1 section, but with an additional gate. (To recap, MLA compresses the key/value space to reduce the KV cache size.)
+此外，对于完整的注意力层，Kimi Linear 用多头潜在注意力 (MLA) 取代了 Qwen3-Next 的门控注意力层（本质上是具有输出门控的标准多头注意力层）。这与我们之前在 DeepSeek V3/R1 部分讨论的 MLA 机制相同，但有一个额外的门。 （回顾一下，MLA 压缩键/值空间以减少 KV 缓存大小。）
 
-The MLA in Kimi Linear does not use the gate, which was intentional so that the authors could compare the architecture more directly to standard MLA, however, they [stated](https://x.com/yzhang_cs/status/1984631714464088563) that they plan to add it in the future.
+Kimi Linear 中的 MLA 不使用门，这是故意的，以便作者可以更直接地将架构与标准 MLA 进行比较，但是，他们 [表示](https://x.com/yzhang_cs/status/1984631714464088563) 计划在将来添加它。
 
-Since we already implemented MLA in [../05_mla](../05_mla), this bonus material focuses on the Gated DeltaNet aspect.
+由于我们已经在 [../05_mla](../05_mla) 中实现了 MLA，因此本奖励材料重点关注门控 DeltaNet 方面。
 
 
-&nbsp;
-## Gated Attention
+ 
+## 门控注意力在我们讨论门控 DeltaNet 本身之前，我们先简单谈谈门。正如上图 Qwen3-Next 架构的上半部分所示，Qwen3-Next 使用了“门控注意力”。这本质上是带有附加 s 形门的常规全注意力。
 
-Before we get to the Gated DeltaNet itself, let's briefly talk about the gate. As you can see in the upper part of the Qwen3-Next architecture in the previous figure, Qwen3-Next uses "gated attention". This is essentially regular full attention with an additional sigmoid gate.
-
-This gating is a simple modification that I added to the `MultiHeadAttention`  code from chapter 3 below for illustration purposes:
+这个门控是一个简单的修改，出于说明目的，我将其添加到下面第 3 章的 `MultiHeadAttention` 代码中：
 
 ```python
 import torch
@@ -105,36 +103,34 @@ class GatedMultiHeadAttention(nn.Module):
 
 
 
-As we can see, after computing attention as usual, the model uses a separate gating signal from the same input, applies a sigmoid to keep it between 0 and 1, and multiplies it with the attention output. This allows the model to scale up or down certain features dynamically. The Qwen3-Next developers [state](https://qwen.ai/blog?id=4074cca80393150c248e508aa62983f9cb7d27cd&from=research.latest-advancements-list) that this helps with training stability:
+正如我们所看到的，在像往常一样计算注意力之后，模型使用来自同一输入的单独门控信号，应用 sigmoid 使其保持在 0 和 1 之间，并将其与注意力输出相乘。这允许模型动态地放大或缩小某些特征。 Qwen3-Next 开发人员 [声明](https://qwen.ai/blog?id=4074cca80393150c248e508aa62983f9cb7d27cd&from=research.latest-advancements-list) 这有助于提高训练稳定性：
 
-> [...] the attention output gating mechanism helps eliminate issues like Attention Sink and Massive Activation, ensuring numerical stability across the model.
+> [...]注意力输出门控机制有助于消除注意力池和大规模激活等问题，确保整个模型的数值稳定性。
 
 
-&nbsp;
-## Gated DeltaNet
+ 
+## 门控 DeltaNet
 
-Now, what is Gated DeltaNet? Gated DeltaNet (short for *Gated Delta Network*) is Qwen3-Next's linear-attention layer, which is intended as an alternative to standard softmax attention. It was adopted from the [Gated Delta Networks: Improving Mamba2 with Delta Rule](https://arxiv.org/abs/2412.06464) paper as mentioned earlier.
+现在，什么是门控 DeltaNet？ Gated DeltaNet（*Gated Delta Network* 的缩写）是 Qwen3-Next 的线性注意力层，旨在作为标准 softmax 注意力的替代方案。它是从前面提到的 [Gated Delta Networks: Improving Mamba2 with Delta Rule](https://arxiv.org/abs/2412.06464) 论文中采用的。
 
-Gated DeltaNet was originally proposed as an improved version of Mamba2, where it combines the gated decay mechanism of Mamba2 with a delta rule.
+门控 DeltaNet 最初是作为 Mamba2 的改进版本提出的，它将 Mamba2 的门控衰减机制与 delta 规则相结合。
 
-Mamba is a state-space model (an alternative to transformers), a big topic that deserves separate coverage in the future.
+Mamba 是一个状态空间模型（Transformer 的替代品），这是一个值得将来单独讨论的大话题。
 
-The delta rule part refers to computing the difference (delta, Δ) between new and predicted values to update a hidden state that is used as a memory state (more on that later).
+Delta 规则部分是指计算新值和预测值之间的差异 (delta, Δ)，以更新用作记忆状态的隐藏状态（稍后会详细介绍）。
 
-(Side note: Readers with classic machine learning literature can think of this as similar to Hebbian learning inspired by biology: "Cells that fire together wire together." It's basically a precursor of the perceptron update rule and gradient descent-based learning, but without supervision.)
+（旁注：阅读经典机器学习文献的读者可以认为这类似于受生物学启发的赫布学习：“一起发射的细胞连接在一起。”它基本上是感知器更新规则和基于梯度下降的学习的先驱，但没有监督。）
 
-Gated DeltaNet has a gate similar to the gate in gated attention discussed earlier, except that it uses a SiLU instead of logistic sigmoid activation, as illustrated below. (The SiLU choice is likely to improve gradient flow and stability over the standard sigmoid.)
+门控 DeltaNet 的门与前面讨论的门控注意力中的门类似，不同之处在于它使用 SiLU 而不是逻辑 sigmoid 激活，如下所示。 （与标准 sigmoid 相比，SiLU 的选择可能会提高梯度流量和稳定性。）
 
-<img src="https://sebastianraschka.com/images/LLMs-from-scratch-images/bonus/gated_deltanet/02.webp" alt="Gated DeltaNet" width=500px>
+<img src="https://sebastianraschka.com/images/LLMs-from-scratch-images/bonus/gated_deltanet/02.webp" alt="Gated DeltaNet" width=500px>然而，如上图所示，Gated DeltaNet 中的“gate”还指的是几个额外的门：
 
-However, as shown in the figure above, the "gated" in the Gated DeltaNet also refers to several additional gates:
+- `α`（衰减门）控制内存随时间衰减或重置的速度，
+- `β`（更新门）控制新输入修改状态的强度。
 
-- `α` (decay gate) controls how fast the memory decays or resets over time,
-- `β` (update gate) controls how strongly new inputs modify the state.
+在代码中，上面描述的门控 DeltaNet 的简化版本（没有卷积混合）可以按如下方式实现（该代码受到 Qwen3 团队的 [官方实现](https://github.com/huggingface/transformers/blob/0ed6d51ae8ed3f4fafca67a983b8d75bc76cd51b/src/transformers/models/qwen3_next/modular_qwen3_next.py#L835) 的启发）。
 
-In code, a simplified version of the Gated DeltaNet depicted above (without the convolutional mixing) can be implemented as follows (the code is inspired by the [official implementation](https://github.com/huggingface/transformers/blob/0ed6d51ae8ed3f4fafca67a983b8d75bc76cd51b/src/transformers/models/qwen3_next/modular_qwen3_next.py#L835) by the Qwen3 team).
-
-(Note that some implementations refer to the decay gate as `gk` (gate for step k), where `exp(gk)` matches the paper's $\alpha_t$. To keep this relationship explicit, the snippet below separates the log-space gate `alpha_log` from the exponentiated decay `alpha`.)
+（请注意，某些实现将衰减门称为 `gk`（步骤 k 的门），其中 `exp(gk)` 与论文的 $\alpha_t$ 匹配。为了保持这种关系明确，下面的代码片段将对数空间门 `alpha_log` 与指数衰减 `alpha` 分开。）
 
 
 ```python
@@ -248,13 +244,13 @@ class GatedDeltaNet(nn.Module):
         return out
 ```
 
-(Note that for simplicity, I omitted the convolutional mixing that Qwen3-Next and Kimi Linear use to keep the code more readable and focus on the recurrent aspects.)
+（请注意，为了简单起见，我省略了 Qwen3-Next 和 Kimi Linear 使用的卷积混合，以保持代码更具可读性并专注于循环方面。）
 
-So, as we can see above, there are lots of differences to standard (or gated) attention.
+因此，正如我们在上面所看到的，标准（或门控）注意力有很多差异。
 
-In gated attention, the model computes normal attention between all tokens (every token attends or looks at every other token). Then, after getting the attention output, a gate (a sigmoid) decides how much of that output to keep. The takeaway is that it's still the the regular scaled-dot product attention that scales quadratically with the context length.
+在门控注意力中，模型计算所有令牌之间的正常注意力（每个令牌都参与或查看每个其他令牌）。然后，在获得注意力输出后，门（sigmoid）决定保留多少输出。结论是，它仍然是常规的缩放点积注意力，与上下文长度呈二次方缩放。
 
-As a refresher, scaled-dot production attention is computed as softmax(QKᵀ)V, where Q and K are *n*-by-*d* matrices, where *n* is the number of input tokens, and *d* is the embedding dimension. So QKᵀ results in an attention *n*-by-*n* matrix, that is multiplied by a *n*-by-*d* dimensional value matrix V:
+作为复习，缩放点生产注意力计算为 softmax(QKᵀ)V，其中 Q 和 K 是 *n*×*d* 矩阵，其中 *n* 是输入标记的数量，*d* 是嵌入维度。因此 QKᵀ 会产生一个注意力 *n*×n* 矩阵，该矩阵乘以 *n*×d* 维值矩阵 V：
 
 ```
 attn_scores = queries @ keys.transpose(2, 3)
@@ -276,7 +272,7 @@ context = context.reshape(b, num_tokens, self.d_out)
 
 <img src="https://sebastianraschka.com/images/LLMs-from-scratch-images/bonus/gated_deltanet/03.webp" alt="Quadratic attention" width=500px />
 
-In Gated DeltaNet, there's no  *n*-by-*n* attention matrix. Instead, the model processes tokens one by one. It keeps a running memory (a state) that gets updated as each new token comes in. This is what's implemented as, where `S` is the state that gets updated recurrently for each time step *t*.
+在门控 DeltaNet 中，没有 *n*×n* 注意力矩阵。相反，模型会一一处理令牌。它保留一个运行内存（状态），随着每个新令牌的进入而更新。这就是实现的方式，其中 `S` 是每个时间步 *t* 循环更新的状态。
 
 ```python
 S = x.new_zeros(b, self.num_heads, self.head_dim, self.head_dim)
@@ -296,55 +292,51 @@ for t in range(num_tokens):
     y_t = (S * q_t.unsqueeze(-1)).sum(dim=-2)
 ```
 
-And the gates control how that memory changes:
+门控制着记忆如何改变：
 
-- α (`alpha`) regulates how much of the old memory to forget (decay).
+- α (`alpha`) 调节旧记忆的遗忘量（衰减）。
 
-- β (`beta`) regulates how much the current token at time step *t* updates the memory.
+- β (`beta`) 调节当前令牌在时间步 *t* 更新内存的数量。（上面的代码片段中没有显示最终的输出门，它类似于门控注意力；它控制保留多少输出。）
 
-(And the final output gate, not shown in the snippet above, is similar to gated attention; it controls how much of the output is kept.)
+因此，从某种意义上说，门控 DeltaNet 中的状态更新类似于循环神经网络 (RNN) 的工作原理。优点是它可以线性缩放（通过 for 循环），而不是与上下文长度成二次方缩放。
 
-So, in a sense, this state update in Gated DeltaNet is similar to how recurrent neural networks (RNNs) work. The advantage is that it scales linearly (via the for-loop) instead of quadratically with context length.
+这种循环状态更新的缺点是，与常规（或门控）注意力相比，它牺牲了来自完全成对注意力的全局上下文建模能力。
 
-The downside of this recurrent state update is that, compared to regular (or gated) attention, it sacrifices the global context modeling ability that comes from full pairwise attention.
+门控 DeltaNet 在某种程度上仍然可以捕获上下文，但它必须克服内存 (*S*) 瓶颈。该内存是固定大小的，因此效率更高，但它将过去的上下文压缩为类似于 RNN 的单个隐藏状态。
 
-Gated DeltaNet, can, to some extend, still capture context, but it has to go through the memory (*S*) bottleneck. That memory is a fixed size and thus more efficient, but it compresses past context into a single hidden state similar to RNNs.
+这就是为什么 Qwen3-Next 和 Kimi Linear 架构没有用 DeltaNet 层替换所有注意力层，而是使用前面提到的 3:1 比例。
 
-That's why the Qwen3-Next and Kimi Linear architectures don't replace all attention layers with DeltaNet layers but use the 3:1 ratio mentioned earlier.
+ 
+## DeltaNet 内存节省
 
-&nbsp;
-## DeltaNet Memory Savings
+在上一节中，我们讨论了 DeltaNet 相对于完全注意力机制的优势，即相对于上下文长度的线性计算复杂性（而不是二次计算复杂性）。
 
-In the previous section, we discussed the advantage of the DeltaNet over full attention in terms of linear instead of quadratic compute complexity with respect to the context length.
+除了线性计算复杂性之外，DeltaNet 的另一大优势是节省内存，因为 DeltaNet 模块不会增加 KV 缓存。 （有关 KV 缓存的更多信息，请参阅 [../03_kv-cache](../03_kv-cache)）。相反，如前所述，它们保持固定大小的循环状态，因此内存随着上下文长度保持不变。
 
-Next to the linear compute complexity, another big advantage of DeltaNet is the memory savings, as DeltaNet modules don't grow the KV cache. (For more information about KV caching, see [../03_kv-cache](../03_kv-cache)). Instead, as mentioned earlier, they keep a fixed-size recurrent state, so memory stays constant with context length.
-
-For a regular multi-head attention (MHA) layer, we can compute the KV cache size as follows:
+对于常规的多头注意力（MHA）层，我们可以计算 KV 缓存大小如下：
 
 ```
 KV_cache_MHA ≈ batch_size × n_tokens × n_heads × d_head × 2 × bytes
 ```
 
-(The 2 multiplier is there because we have both keys and values that we store in the cache.)
+（存在 2 乘数是因为我们在缓存中存储了键和值。）
 
-For the simplified DeltaNet version implemented above, we have:
+对于上面实现的简化 DeltaNet 版本，我们有：
 
 
 ```
 KV_cache_DeltaNet = batch_size × n_heads × d_head × d_head × bytes
 ```
 
-Note that the `KV_cache_DeltaNet` memory size doesn't have a context length (`n_tokens`) dependency. Also, we have only the memory state S that we store instead of separate keys and values, hence `2 × bytes` becomes just `bytes`. However, note that we now have a quadratic `d_head × d_head` in here. This comes from the state :
+请注意，`KV_cache_DeltaNet` 内存大小没有上下文长度 (`n_tokens`) 依赖性。此外，我们只有存储的内存状态 S，而不是单独的键和值，因此 `2 × bytes` 就变成了 `bytes`。但是，请注意，这里现在有一个二次 `d_head × d_head`。这来自国家：
 
 ```
 S = x.new_zeros(b, self.num_heads, self.head_dim, self.head_dim)
 ```
 
-But that's usually nothing to worry about, as the head dimension is usually relatively small. For instance, it's 128 in Qwen3-Next.
+但这通常无需担心，因为头部尺寸通常相对较小。例如，Qwen3-Next 中的值为 128。带有卷积混合的完整版本有点复杂，包括内核大小等，但上面的公式应该说明了门控 DeltaNet 背后的主要趋势和动机。
 
-The full version with the convolutional mixing is a bit more complex, including the kernel size and so on, but the formulas above should illustrate the main trend and motivation behind the Gated DeltaNet.
-
-We can visualize the memory estimates and savings for different context lengths via the following helper script:
+我们可以通过以下帮助程序脚本可视化不同上下文长度的内存估计和节省：
 
 ```bash
 uv run plot_memory_estimates_gated_deltanet.py \
@@ -354,6 +346,6 @@ uv run plot_memory_estimates_gated_deltanet.py \
   --dtype "bf16"
 ```
 
-Note that the above computes the `head_dim` as `emb_dim / n_heads`. I.e., 2048 / 16  = 128.
+请注意，上面将 `head_dim` 计算为 `emb_dim / n_heads`。即 2048 / 16 = 128。
 
 <img src="https://sebastianraschka.com/images/LLMs-from-scratch-images/bonus/gated_deltanet/plot.webp" alt="Gated DeltaNet scaling" width=500px>

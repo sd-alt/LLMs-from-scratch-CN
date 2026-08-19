@@ -1,8 +1,8 @@
-# Chapter 7: Finetuning to Follow Instructions
+# 第 7 章：微调以遵循说明
 
-This folder contains utility code that can be used for preparing an instruction dataset.
+此文件夹包含可用于准备指令数据集的实用程序代码。
 
-Install the additional package requirements via:
+通过以下方式安装附加包要求：
 
 ```bash
 pip install -r requirements-extra.txt
@@ -12,9 +12,9 @@ pip install -r requirements-extra.txt
 
 
 
-### Finding Near Duplicates
+### 查找附近的重复项
 
-The `find-near-duplicates.py` function can be used to identify duplicates and near-duplicates in an instruction dataset. For example,
+`find-near-duplicates.py` 函数可用于识别指令数据集中的重复项和近似重复项。例如，
 
 
 
@@ -59,16 +59,16 @@ Duplicate pair found with similarity 1.00:
 
 ```
 
-&nbsp;
-You can use the `--threshold` setting with a value between 0 and 1 to decrease or increase the sensitivity.
-The default threshold is 0.9.
+ 
+您可以使用 `--threshold` 设置的 0 到 1 之间的值来降低或提高灵敏度。
+默认阈值为 0.9。
 
 
 
-&nbsp;
- ## Creating Passive Voice Entries
+ 
+ ## 创建被动语态条目
 
- - The [create-passive-voice-entries.ipynb](create-passive-voice-entries.ipynb) notebook uses OpenAI's GPT-4 to create "passive voice" entries for an instruction dataset, as shown in the example below
+ - [create-passive-voice-entries.ipynb](create-passive-voice-entries.ipynb) 笔记本使用 OpenAI 的 GPT-4 为指令数据集创建“被动语态”条目，如下例所示
 
  ```python
  {  
