@@ -1,34 +1,34 @@
-# Converting GPT to Llama
+# 将 GPT 转换为 Llama
 
 
 
-This folder contains code for converting the GPT implementation from chapter 4 and 5 to Meta AI's Llama architecture in the following recommended reading order:
+该文件夹包含用于将 GPT 实现从第 4 章和第 5 章转换为 Meta AI 的 Llama 架构的代码，建议阅读顺序如下：
 
-- [converting-gpt-to-llama2.ipynb](converting-gpt-to-llama2.ipynb): contains code to convert GPT to Llama 2 7B step by step and loads pretrained weights from Meta AI
-- [converting-llama2-to-llama3.ipynb](converting-llama2-to-llama3.ipynb): contains code to convert the Llama 2 model to Llama 3, Llama 3.1, and Llama 3.2
-- [standalone-llama32.ipynb](standalone-llama32.ipynb): a standalone notebook implementing Llama 3.2
+- [conversion-gpt-to-llama2.ipynb](converting-gpt-to-llama2.ipynb)：包含逐步将 GPT 转换为 Llama 2 7B 的代码，并从 Meta AI 加载预训练权重
+- [conversion-llama2-to-llama3.ipynb](converting-llama2-to-llama3.ipynb)：包含将 Llama 2 模型转换为 Llama 3、Llama 3.1 和 Llama 3.2 的代码
+- [独立-llama32.ipynb](standalone-llama32.ipynb)：实现Llama 3.2的独立笔记本
 
 <img src="https://sebastianraschka.com/images/LLMs-from-scratch-images/bonus/gpt-to-llama/gpt-and-all-llamas.webp">
 
 
-&nbsp;
-### Using Llama 3.2 via the `llms-from-scratch` package
+ 
+### 通过 `llms-from-scratch` 包使用 Llama 3.2
 
-For an easy way to use the Llama 3.2 1B and 3B models, you can also use the `llms-from-scratch` PyPI package based on the source code in this repository at [pkg/llms_from_scratch](../../pkg/llms_from_scratch).
+为了轻松使用 Llama 3.2 1B 和 3B 模型，您还可以使用基于 [pkg/llms_from_scratch](../../pkg/llms_from_scratch) 的此存储库中的源代码的 `llms-from-scratch` PyPI 包。
 
-&nbsp;
-#### 1) Installation
+ 
+#### 1）安装
 
 ```bash
 pip install llms_from_scratch blobfile
 ```
 
-(Note that `blobfile` is needed to load the tokenizer.)
+（请注意，加载分词器需要 `blobfile`。）
 
-&nbsp;
-#### 2) Model and text generation settings
+ 
+#### 2) 模型和文本生成设置
 
-Specify which model to use:
+指定要使用的模型：
 
 ```python
 MODEL_FILE = "llama3.2-1B-instruct.pth"
@@ -37,7 +37,7 @@ MODEL_FILE = "llama3.2-1B-instruct.pth"
 # MODEL_FILE = "llama3.2-3B-base.pth"
 ```
 
-Basic text generation settings that can be defined by the user. Note that the recommended 8192-token context size requires approximately 3 GB of VRAM for the text generation example.
+可由用户定义的基本文本生成设置。请注意，对于文本生成示例，建议的 8192 个令牌上下文大小需要大约 3 GB VRAM。
 
 ```python
 # Text generation settings
@@ -51,10 +51,10 @@ TEMPERATURE = 0.
 TOP_K = 1
 ```
 
-&nbsp;
-#### 3) Weight download and loading
+ 
+#### 3）权重下载和加载
 
-This automatically downloads the weight file based on the model choice above:
+这会根据上面的模型选择自动下载权重文件：
 
 ```python
 import os
@@ -72,7 +72,7 @@ if not os.path.exists(MODEL_FILE):
     print(f"Downloaded to {MODEL_FILE}")
 ```
 
-The model weights are then loaded as follows:
+然后按如下方式加载模型权重：
 
 ```python
 import torch
@@ -96,10 +96,10 @@ device = (
 model.to(device)
 ```
 
-&nbsp;
-#### 4) Initialize tokenizer
+ 
+#### 4) 初始化分词器
 
-The following code downloads and initializes the tokenizer:
+以下代码下载并初始化分词器：
 
 ```python
 from llms_from_scratch.llama3 import Llama3Tokenizer, ChatFormat, clean_text
@@ -118,10 +118,10 @@ if "instruct" in MODEL_FILE:
     tokenizer = ChatFormat(tokenizer)
 ```
 
-&nbsp;
-#### 5) Generating text
+ 
+#### 5) 生成文本
 
-Lastly, we can generate text via the following code:
+最后，我们可以通过以下代码生成文本：
 
 ```python
 import time
@@ -162,7 +162,7 @@ if "instruct" in MODEL_FILE:
 print("\n\nOutput text:\n\n", output_text)
 ```
 
-When using the Llama 3.2 1B Instruct model, the output should look similar to the one shown below:
+使用 Llama 3.2 1B Instruct 模型时，输出应类似于下图所示：
 
 ```
 Time: 3.17 sec
@@ -182,50 +182,50 @@ Output text:
 It's worth noting that the specific diet of llamas can vary depending on factors such as the breed,
 ```
 
-&nbsp;
-#### Pro tip 1: speed up inference with FlashAttention
+ 
+#### 专业技巧 1：使用 FlashAttention 加速推理
 
-Instead of using `Llama3Model`, you can use `Llama3ModelFast` as a drop-in replacement. For more information, I encourage you to inspect the [pkg/llms_from_scratch/llama3.py](../../pkg/llms_from_scratch/llama3.py) code.
+您可以使用 `Llama3ModelFast` 作为直接替代品，而不是使用 `Llama3Model`。有关更多信息，我鼓励您检查 [pkg/llms_from_scratch/llama3.py](../../pkg/llms_from_scratch/llama3.py) 代码。
 
-The `Llama3ModelFast` replaces my from-scratch scaled dot-product code in the `GroupedQueryAttention` module with PyTorch's `scaled_dot_product` function, which uses `FlashAttention` on Ampere GPUs or newer.
+`Llama3ModelFast` 使用 PyTorch 的 `scaled_dot_product` 函数替换了 `GroupedQueryAttention` 模块中的从头开始缩放的点积代码，该函数在 Ampere GPU 或更高版本上使用 `FlashAttention`。
 
-The following table shows a performance comparison on an A100:
+下表显示了 A100 上的性能比较：
 
-|                 | Tokens/sec | Memory  |
-| --------------- | ---------- | ------- |
-| Llama3Model     | 42         | 2.91 GB |
-| Llama3ModelFast | 54         | 2.91 GB |
+|                 |令牌/秒 |内存|
+| ---------------- | ---------- | -------- |
+|骆驼3模型 | 42 | 2.91 GB |
+|骆驼3模型快速 | 54 | 2.91 GB |
 
-&nbsp;
-#### Pro tip 2: speed up inference with compilation
+ 
+#### 专业技巧 2：通过编译加速推理
 
 
-For up to a 4× speed-up, replace
+要获得高达 4 倍的加速，请替换
 
 ```python
 model.to(device)
 ```
 
-with
+与
 
 ```python
 model = torch.compile(model)
 model.to(device)
 ```
 
-Note: There is a significant multi-minute upfront cost when compiling, and the speed-up takes effect after the first `generate` call. 
+注意：编译时会产生大量的多分钟前期成本，并且加速在第一次 `generate` 调用后生效。
 
-The following table shows a performance comparison on an A100 for consequent `generate` calls:
+下表显示了 A100 上后续 `generate` 调用的性能比较：
 
-|                 | Tokens/sec | Memory  |
-| --------------- | ---------- | ------- |
-| Llama3Model     | 170        | 3.12 GB |
-| Llama3ModelFast | 177        | 3.61 GB |
+|                 |令牌/秒 |内存|
+| ---------------- | ---------- | -------- |
+|骆驼3模型 | 170 | 3.12 GB |
+|骆驼3模型快速 | 177 | 3.61 GB |
 
-&nbsp;
-#### Pro tip 3: speed up inference with compilation
+ 
+#### 专业技巧 3：通过编译加速推理
 
-You can significantly boost inference performance using the KV cache `Llama3Model` drop-in replacement when running the model on a CPU. (See my [Understanding and Coding the KV Cache in LLMs from Scratch](https://magazine.sebastianraschka.com/p/coding-the-kv-cache-in-llms) article to learn more about KV caches.)
+在 CPU 上运行模型时，您可以使用 KV 缓存 `Llama3Model` 直接替换显着提高推理性能。 （请参阅我的 [从头开始在 LLM 中理解和编码 KV 缓存](https://magazine.sebastianraschka.com/p/coding-the-kv-cache-in-llms) 文章，了解有关 KV 缓存的更多信息。）
 
 ```python
 from llms_from_scratch.kv_cache.llama3 import Llama3Model
@@ -241,23 +241,23 @@ token_ids = generate_text_simple(
 )
 ```
 
-Note that the peak memory usage is only listed for Nvidia CUDA devices, as it is easier to calculate. However, the memory usage on other devices is likely similar as it uses a similar precision format, and the KV cache storage results in even lower memory usage here for the generated 150-token text (however, different devices may implement matrix multiplication differently and may result in different peak memory requirements; and KV-cache memory may increase prohibitively for longer contexts lengths).
+请注意，峰值内存使用量仅针对 Nvidia CUDA 设备列出，因为它更容易计算。然而，其他设备上的内存使用情况可能相似，因为它使用类似的精度格式，并且 KV 缓存存储导致生成的 150 个令牌文本的内存使用量甚至更低（但是，不同的设备可能以不同的方式实现矩阵乘法，并可能导致不同的峰值内存需求；并且 KV 缓存内存可能会因较长的上下文长度而大幅增加）。
 
-| Model       | Mode              | Hardware        | Tokens/sec | GPU Memory (VRAM) |
-| ----------- | ----------------- | --------------- | ---------- | ----------------- |
-| Llama3Model | Regular           | Mac Mini M4 CPU | 1          | -                 |
-| Llama3Model | Regular compiled  | Mac Mini M4 CPU | 1          | -                 |
-| Llama3Model | KV cache          | Mac Mini M4 CPU | 68         | -                 |
-| Llama3Model | KV cache compiled | Mac Mini M4 CPU | 86         | -                 |
+|型号|模式|硬件|令牌/秒 | GPU 内存 (VRAM) |
+| ----------- | ----------------- | ---------------- | ---------- | ----------------- |
+|骆驼3模型|常规| Mac Mini M4 CPU | 1 | - |
+|骆驼3模型|常规编译| Mac Mini M4 CPU | 1 | - |
+|骆驼3模型| KV缓存| Mac Mini M4 CPU | 68 | - |
+|骆驼3模型| KV缓存编译| Mac Mini M4 CPU | 86 | - |
 |             |                   |                 |            |                   |
-| Llama3Model | Regular           | Mac Mini M4 GPU | 15         | -                 |
-| Llama3Model | Regular compiled  | Mac Mini M4 GPU | Error      | -                 |
-| Llama3Model | KV cache          | Mac Mini M4 GPU | 62         | -                 |
-| Llama3Model | KV cache compiled | Mac Mini M4 GPU | Error      | -                 |
+|骆驼3模型|常规| Mac Mini M4 GPU | 15 | - |
+|骆驼3模型|常规编译| Mac Mini M4 GPU |错误| - |
+|骆驼3模型| KV缓存| Mac Mini M4 GPU | 62 | - |
+|骆驼3模型| KV缓存编译| Mac Mini M4 GPU |错误| - |
 |             |                   |                 |            |                   |
-| Llama3Model | Regular           | Nvidia A100 GPU | 42         | 2.91 GB           |
-| Llama3Model | Regular compiled  | Nvidia A100 GPU | 170        | 3.12 GB           |
-| Llama3Model | KV cache          | Nvidia A100 GPU | 58         | 2.87 GB           |
-| Llama3Model | KV cache compiled | Nvidia A100 GPU | 161        | 3.61 GB           |
+|骆驼3模型|常规| Nvidia A100 GPU | 42 | 2.91 GB |
+|骆驼3模型|常规编译| Nvidia A100 GPU | 170 | 3.12 GB |
+|骆驼3模型| KV缓存| Nvidia A100 GPU | 58 | 2.87 GB |
+|骆驼3模型| KV缓存编译| Nvidia A100 GPU | 161 | 3.61 GB |
 
-Note that all settings above have been tested to produce the same text outputs.
+请注意，上述所有设置都经过测试，可产生相同的文本输出。

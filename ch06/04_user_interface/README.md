@@ -1,39 +1,39 @@
-# Building a User Interface to Interact With the GPT-based Spam Classifier
+# 构建用户界面以与基于 GPT 的垃圾邮件分类器交互
 
 
 
-This bonus folder contains code for running a ChatGPT-like user interface to interact with the finetuned GPT-based spam classifier from chapter 6, as shown below.
+此奖励文件夹包含用于运行类似 ChatGPT 的用户界面的代码，以与第 6 章中经过微调的基于 GPT 的垃圾邮件分类器进行交互，如下所示。
 
 
 
-![Chainlit UI example](https://sebastianraschka.com/images/LLMs-from-scratch-images/bonus/chainlit/chainlit-spam.webp)
+![Chainlit UI 示例](https://sebastianraschka.com/images/LLMs-from-scratch-images/bonus/chainlit/chainlit-spam.webp)
 
 
 
-To implement this user interface, we use the open-source [Chainlit Python package](https://github.com/Chainlit/chainlit).
+为了实现此用户界面，我们使用开源 [Chainlit Python 包](https://github.com/Chainlit/chainlit)。
 
-&nbsp;
-## Step 1: Install dependencies
+ 
+## 第 1 步：安装依赖项
 
-First, we install the `chainlit` package via
+首先，我们通过以下方式安装 `chainlit` 包
 
 ```bash
 pip install chainlit
 ```
 
-(Alternatively, execute `pip install -r requirements-extra.txt`.)
+（或者，执行 `pip install -r requirements-extra.txt`。）
 
-&nbsp;
-## Step 2: Run `app` code
+ 
+## 步骤 2：运行 `app` 代码
 
-The [`app.py`](app.py) file contains the UI code based. Open and inspect these files to learn more.
+[`app.py`](app.py) 文件包含基于 UI 代码。打开并检查这些文件以了解更多信息。
 
-This file loads and uses the GPT-2 classifier weights we generated in chapter 6. This requires that you execute the [`../01_main-chapter-code/ch06.ipynb`](../01_main-chapter-code/ch06.ipynb) file first.
+该文件加载并使用我们在第 6 章中生成的 GPT-2 分类器权重。这要求您首先执行 [`../01_main-chapter-code/ch06.ipynb`](../01_main-chapter-code/ch06.ipynb) 文件。
 
-Excecute the following command from the terminal to start the UI server:
+从终端执行以下命令启动 UI 服务器：
 
 ```bash
 chainlit run app.py
 ```
 
-Running commands above should open a new browser tab where you can interact with the model. If the browser tab does not open automatically, inspect the terminal command and copy the local address into your browser address bar (usually, the address is `http://localhost:8000`).
+运行上面的命令应该会打开一个新的浏览器选项卡，您可以在其中与模型进行交互。如果浏览器选项卡没有自动打开，请检查终端命令并将本地地址复制到浏览器地址栏中（通常该地址为 `http://localhost:8000`）。

@@ -1,45 +1,43 @@
-# Docker Environment Setup Guide
+# Docker 环境搭建指南
 
-If you prefer a development setup that isolates a project's dependencies and configurations, using Docker is a highly effective solution. This approach eliminates the need to manually install software packages and libraries and ensures a consistent development environment.
+如果您更喜欢隔离项目依赖项和配置的开发设置，那么使用 Docker 是一个非常有效的解决方案。这种方法消除了手动安装软件包和库的需要，并确保了一致的开发环境。
 
-This guide will walk you through the process for setting up an optional docker environment for this book if you prefer it over using the conda approach explained in [../01_optional-python-setup-preferences](../01_optional-python-setup-preferences) and [../02_installing-python-libraries](../02_installing-python-libraries).
-
-<br>
-
-## Downloading and installing Docker
-
-The easiest way to get started with Docker is by installing [Docker Desktop](https://docs.docker.com/desktop/) for your relevant platform.
-
-Linux (Ubuntu) users may prefer to install the [Docker Engine](https://docs.docker.com/engine/install/ubuntu/) instead and follow the [post-installation](https://docs.docker.com/engine/install/linux-postinstall/) steps.
+如果您更喜欢使用 [../01_optional-python-setup-preferences](../01_optional-python-setup-preferences) 和 [../02_installing-python-libraries](../02_installing-python-libraries) 中解释的 conda 方法，本指南将引导您完成为本书设置可选 docker 环境的过程。
 
 <br>
 
-## Using a Docker DevContainer in Visual Studio Code
+## 下载并安装 Docker
 
-A Docker DevContainer, or Development Container, is a tool that allows developers to use Docker containers as a fully-fledged development environment. This approach ensures that users can quickly get up and running with a consistent development environment, regardless of their local machine setup.
+开始使用 Docker 的最简单方法是为您的相关平台安装 [Docker Desktop](https://docs.docker.com/desktop/)。
 
-While DevContainers also work with other IDEs, a commonly used IDE/editor for working with DevContainers is Visual Studio Code (VS Code). The guide below explains how to use the DevContainer for this book within a VS Code context, but a similar process should also apply to PyCharm. [Install](https://code.visualstudio.com/download) it if you don't have it and want to use it.
+Linux (Ubuntu) 用户可能更喜欢安装 [Docker Engine](https://docs.docker.com/engine/install/ubuntu/)，并按照 [安装后](https://docs.docker.com/engine/install/linux-postinstall/) 步骤进行操作。
 
-1. Clone this GitHub repository and `cd` into the project root directory.
+<br>
+
+## 在 Visual Studio Code 中使用 Docker DevContainer
+
+Docker DevContainer（即开发容器）是一种允许开发人员使用 Docker 容器作为成熟的开发环境的工具。这种方法确保用户可以快速启动并运行一致的开发环境，无论其本地计算机设置如何。
+
+虽然 DevContainers 还可以与其他 IDE 配合使用，但与 DevContainers 配合使用的常用 IDE/编辑器是 Visual Studio Code (VS Code)。下面的指南解释了如何在 VS Code 上下文中使用本书的 DevContainer，但类似的过程也应适用于 PyCharm。 [如果您没有但想要使用它，请安装](https://code.visualstudio.com/download)。
+
+1. 将此 GitHub 存储库和 `cd` 克隆到项目根目录中。
 
 ```bash
 git clone https://github.com/rasbt/LLMs-from-scratch.git
 cd LLMs-from-scratch
 ```
 
-2. Move the `.devcontainer` folder from `setup/03_optional-docker-environment/` to the current directory (project root).
+2. 将 `.devcontainer` 文件夹从 `setup/03_optional-docker-environment/` 移动到当前目录（项目根目录）。
 
 ```bash
 mv setup/03_optional-docker-environment/.devcontainer ./
 ```
 
-3. In Docker Desktop, make sure that **_desktop-linux_ builder** is running and will be used to build the Docker container (see _Docker Desktop_ -> _Change settings_ -> _Builders_ -> _desktop-linux_ -> _..._ -> _Use_)
+3. 在 Docker Desktop 中，确保 **_desktop-linux_ builder** 正在运行并将用于构建 Docker 容器（请参阅_Docker Desktop_ -> _更改设置_ -> _Builders_ -> _desktop-linux_ -> _..._ -> _Use_）
 
-4. If you have a [CUDA-supported GPU](https://developer.nvidia.com/cuda-gpus), you can speed up the training and inference:
+4. 如果您有 [支持 CUDA 的 GPU](https://developer.nvidia.com/cuda-gpus)，则可以加快训练和推理速度：
 
-    4.1 Install **NVIDIA Container Toolkit** as described [here](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#installing-with-apt). NVIDIA Container Toolkit is supported as written [here](https://docs.nvidia.com/cuda/wsl-user-guide/index.html#nvidia-compute-software-support-on-wsl-2).
-
-    4.2 Add _nvidia_ as runtime in Docker Engine daemon config (see _Docker Desktop_ -> _Change settings_ -> _Docker Engine_). Add these lines to your config:
+    4.1 按照此处的 [](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#installing-with-apt) 的说明安装 **NVIDIA Container Toolkit**。支持 NVIDIA Container Toolkit，如此处所写的 [](https://docs.nvidia.com/cuda/wsl-user-guide/index.html#nvidia-compute-software-support-on-wsl-2)。4.2 在 Docker 引擎守护程序配置中添加 _nvidia_ 作为运行时（请参阅_Docker 桌面_ -> _更改设置_ -> _Docker 引擎_）。将这些行添加到您的配置中：
 
     ```json
     "runtimes": {
@@ -48,7 +46,7 @@ mv setup/03_optional-docker-environment/.devcontainer ./
         "runtimeArgs": []
     ```
 
-    For example, the full Docker Engine daemon config json code should look like that:
+    例如，完整的 Docker Engine 守护进程配置 json 代码应如下所示：
 
     ```json
     {
@@ -68,68 +66,66 @@ mv setup/03_optional-docker-environment/.devcontainer ./
     }
     ```
 
-    and restart Docker Desktop.
+    并重新启动 Docker Desktop。
 
-5. Type `code .` in the terminal to open the project in VS Code. Alternatively, you can launch VS Code and select the project to open from the UI.
+5. 在终端中输入 `code .` 以在 VS Code 中打开项目。或者，您可以启动 VS Code 并从 UI 中选择要打开的项目。
 
-6. Install the **Remote Development** extension from the VS Code _Extensions_ menu on the left-hand side.
+6. 从左侧的 VS Code _Extensions_ 菜单安装 **Remote Development** 扩展。
 
-7. Open the DevContainer.
+7. 打开 DevContainer。
 
-Since the `.devcontainer` folder is present in the main `LLMs-from-scratch` directory (folders starting with `.` may be invisible in your OS depending on your settings), VS Code should automatically detect it and ask whether you would like to open the project in a devcontainer. If it doesn't, simply press `Ctrl + Shift + P` to open the command palette and start typing `dev containers` to see a list of all DevContainer-specific options.
+由于 `.devcontainer` 文件夹存在于主 `LLMs-from-scratch` 目录中（以 `.` 开头的文件夹可能在操作系统中不可见，具体取决于您的设置），VS Code 应该自动检测它并询问您是否要在 devcontainer 中打开项目。如果没有，只需按 `Ctrl + Shift + P` 打开命令面板并开始输入 `dev containers` 即可查看所有 DevContainer 特定选项的列表。
 
 
-&nbsp;
-> ⚠️ **Note about running as root**
+ 
+> ⚠️ **关于以 root 身份运行的注意事项**
 >
-> By default, the DevContainer runs as the *root user*. This is not generally recommended for security reasons, but for simplicity in this book's setup, the root configuration is used so that all required packages install cleanly inside the container.
+> 默认情况下，DevContainer 以 *root 用户* 身份运行。出于安全原因，通常不建议这样做，但为了本书设置的简单性，使用根配置，以便所有必需的包都干净地安装在容器内。
 >
-> If you try to start Jupyter Lab manually inside the container, you may see this error:
+> 如果您尝试在容器内手动启动 Jupyter Lab，您可能会看到以下错误：
 >
->   ```bash
+> ```bash
 >   Running as root is not recommended. Use --allow-root to bypass.
 >   ```
 >
->   In this case, you can run:
+> 在这种情况下，您可以运行：
 >
->   ```bash
+> ```bash
 >   uv run jupyter lab --allow-root
 >   ```
 >
-> - When using VS Code with the Jupyter extension, you usually don't need to start Jupyter Lab manually. Opening notebooks through the extension should work out of the box.
-> - Advanced users who prefer stricter security can modify the `.devcontainer.json` to set up a non-root user, but this requires extra configuration and is not necessary for most use cases.
+> - 当使用 VS Code 和 Jupyter 扩展时，通常不需要手动启动 Jupyter Lab。通过扩展打开笔记本应该可以开箱即用。
+> - 喜欢更严格安全性的高级用户可以修改 `.devcontainer.json` 以设置非 root 用户，但这需要额外的配置，并且对于大多数用例来说不是必需的。
 
 
 
-8. Select **Reopen in Container**.
+8. 选择**在容器中重新打开**。
 
-Docker will now begin the process of building the Docker image specified in the `.devcontainer` configuration if it hasn't been built before, or pull the image if it's available from a registry.
+Docker 现在将开始构建 `.devcontainer` 配置中指定的 Docker 映像（如果之前尚未构建），或者拉取该映像（如果可从注册表获取）。
 
-The entire process is automated and might take a few minutes, depending on your system and internet speed. Optionally click on "Starting Dev Container (show log)" in the lower right corner of VS Code to see the current built progress.
+整个过程是自动化的，可能需要几分钟，具体取决于您的系统和互联网速度。可以选择单击 VS Code 右下角的“启动 Dev 容器（显示日志）”来查看当前构建进度。完成后，VS Code 将自动连接到容器并在新创建的 Docker 开发环境中重新打开项目。您将能够编写、执行和调试代码，就像在本地计算机上运行一样，但还具有 Docker 的隔离性和一致性的额外优势。
 
-Once completed, VS Code will automatically connect to the container and reopen the project within the newly created Docker development environment. You will be able to write, execute, and debug code as if it were running on your local machine, but with the added benefits of Docker's isolation and consistency.
+ 
+> **警告：**
+> 如果您在构建过程中遇到错误，这可能是因为您的计算机不支持 NVIDIA 容器工具包，因为您的计算机没有兼容的 GPU。在这种情况下，编辑 `devcontainer.json` 文件以删除 `"runArgs": ["--runtime=nvidia", "--gpus=all"],` 行并再次运行“重新打开开发容器”过程。
 
-&nbsp;
-> **Warning:**
-> If you are encountering an error during the build process, this is likely because your machine does not support NVIDIA container toolkit because your machine doesn't have a compatible GPU. In this case, edit the `devcontainer.json` file to remove the `"runArgs": ["--runtime=nvidia", "--gpus=all"],` line and run the "Reopen Dev Container" procedure again.
+9. 完成。
 
-9. Finished.
-
-Once the image has been pulled and built, you should have your project mounted inside the container with all the packages installed, ready for development.
+提取并构建映像后，您应该将项目安装在容器内，并安装所有软件包，准备进行开发。
 
 <br>
 
-## Uninstalling the Docker Image
+## 卸载 Docker 镜像
 
-Below are instructions for uninstalling or removing a Docker container and image if you no longer plan to use it. This process does not remove Docker itself from your system but rather cleans up the project-specific Docker artifacts.
+如果您不再打算使用 Docker 容器和映像，以下是卸载或删除它的说明。此过程不会从系统中删除 Docker 本身，而是清理特定于项目的 Docker 工件。
 
-1. List all Docker images to find the one associated with your DevContainer:
+1. 列出所有 Docker 镜像以查找与您的 DevContainer 关联的镜像：
 
 ```bash
 docker image ls
 ```
 
-2. Remove the Docker image using its image ID or name:
+2. 使用镜像 ID 或名称删除 Docker 镜像：
 
 ```bash
 docker image rm [IMAGE_ID_OR_NAME]
@@ -137,6 +133,6 @@ docker image rm [IMAGE_ID_OR_NAME]
 
 <br>
 
-## Uninstalling Docker
+## 卸载 Docker
 
-If you decide that Docker is not for you and wish to uninstall it, see the official documentation [here](https://docs.docker.com/desktop/uninstall/) that outlines the steps for your specific operating system.
+如果您认为 Docker 不适合您并希望卸载它，请参阅此处的官方文档 [](https://docs.docker.com/desktop/uninstall/)，其中概述了适用于您的特定操作系统的步骤。

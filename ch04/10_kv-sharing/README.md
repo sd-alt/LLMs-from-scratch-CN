@@ -1,44 +1,44 @@
-# Cross-Layer KV Sharing
+# 跨层KV共享
 
-This bonus material illustrates the memory savings when using cross-layer KV sharing together with a KV cache.
+此奖励材料说明了将跨层 KV 共享与 KV 缓存一起使用时的内存节省。
 
-&nbsp;
-## Introduction
+ 
+## 简介
 
-In [../04_gqa](../04_gqa), we discussed Grouped-Query Attention (GQA), where several query heads share the same key and value heads. Cross-layer KV sharing applies a related idea across transformer layers.
+在 [../04_gqa](../04_gqa) 中，我们讨论了分组查询注意（GQA），其中多个查询头共享相同的键和值头。跨层 KV 共享在变压器层之间应用了相关的想法。
 
-Instead of computing a fresh key and value projection in every layer, later layers reuse K/V tensors from an earlier layer. They still compute their own queries, so each layer can form its own attention pattern. The main memory saving comes from storing fewer K/V tensors in the cache.
+后面的层不会在每一层中计算新的键和值投影，而是重用早期层中的 K/V 张量。他们仍然计算自己的查询，因此每一层都可以形成自己的注意力模式。主要的内存节省来自于在缓存中存储更少的 K/V 张量。
 
-This idea is also called cross-layer attention. It is described in Brandon *et al.*, [Reducing Transformer Key-Value Cache Size with Cross-Layer Attention](https://arxiv.org/abs/2405.12981). Gemma 4 E2B and E4B use a related shared KV-cache scheme, which makes this a useful addition to the GQA, MLA, and SWA examples in this chapter.
+这个想法也称为跨层注意力。 Brandon *等人*，[Reducing Transformer Key-Value Cache Size with Cross-Layer Attention](https://arxiv.org/abs/2405.12981) 中对此进行了描述。 Gemma 4 E2B 和 E4B 使用相关的共享 KV 缓存方案，这使其成为本章中 GQA、MLA 和 SWA 示例的有用补充。
 
-&nbsp;
+ 
 
 <img src="gemma4-kv-sharing.webp" alt="Cross-layer KV sharing" width="800px" />
 
-&nbsp;
+ 
 
-In [Gemma 4](../../ch05/17_gemma4), KV sharing is combined with GQA or MQA and sliding window attention. For the simplified GPT example in this folder, we only implement the cross-layer KV-sharing part, so the code stays focused on the main mechanism.
+在[Gemma 4](../../ch05/17_gemma4)中，KV共享与GQA或MQA以及滑动窗口注意力相结合。对于该文件夹中的简化 GPT 示例，我们仅实现了跨层 KV 共享部分，因此代码仍专注于主要机制。
 
-The simplified rule used here is:
+这里使用的简化规则是：
 
-1. Early layers compute and cache their own K/V tensors.
-2. Later layers reuse the most recent K/V tensors from an earlier producing layer.
-3. All layers still compute their own query projections.
+1. 早期层计算并缓存自己的 K/V 张量。
+2. 后面的层重用来自较早生成层的最新 K/V 张量。
+3. 所有层仍然计算自己的查询投影。
 
-This reduces the number of K/V caches that grow with context length. The tradeoff is reduced model capacity because some layers no longer get their own K/V projections.
+这减少了随着上下文长度而增长的 K/V 缓存的数量。代价是模型容量减少，因为某些层不再获得自己的 K/V 投影。
 
-&nbsp;
-## KV-Sharing Memory Savings
+ 
+## KV-共享内存节省
 
-The usual KV-cache memory is computed as follows:
+通常的 KV 缓存内存计算如下：
 
-bytes = batch_size x seqlen x head_dim x n_kv_heads x n_layers x 2 (K,V) x bytes_per_elem
+字节=batch_size x seqlen x head_dim x n_kv_heads x n_layers x 2 (K,V) x bytes_per_elem
 
-With cross-layer KV sharing, we replace `n_layers` with the number of K/V-producing layers:
+通过跨层 KV 共享，我们将 `n_layers` 替换为 K/V 生成层的数量：
 
-bytes = batch_size x seqlen x head_dim x n_kv_heads x n_kv_producing_layers x 2 (K,V) x bytes_per_elem
+字节=batch_size x seqlen x head_dim x n_kv_heads x n_kv_having_layers x 2 (K,V) x bytes_per_elem
 
-You can use the [memory_estimator_kv_sharing.py](memory_estimator_kv_sharing.py) script in this folder to apply this to different model configs:
+您可以使用此文件夹中的 [memory_estimator_kv_sharing.py](memory_estimator_kv_sharing.py) 脚本将其应用于不同的模型配置：
 
 ```bash
 # Gemma 4 E2B-like setup
@@ -84,37 +84,37 @@ Ratio (MHA / GQA+sharing) : 18.67x
 Savings vs MHA            : 94.64%
 ```
 
-This is a Gemma 4 E2B-like setup. The 35 layers include 15 K/V-producing layers, and the remaining layers reuse earlier K/V tensors. For the E4B-like setup, the corresponding numbers are 42 total layers and 24 K/V-producing layers.
+这是类似 Gemma 4 E2B 的设置。这 35 层包括 15 K/V 生成层，其余层重复使用早期的 K/V 张量。对于类似 E4B 的设置，相应的数字为总共 42 个层和 24 K/V 生成层。
 
-The savings are shown below for the E2B-like and E4B-like setups. For simplicity, these plots do not include additional savings from sliding window attention.
+下面显示了类似 E2B 和类似 E4B 设置的节省情况。为简单起见，这些图不包括滑动窗口注意力带来的额外节省。
 
-&nbsp;
+ 
 
 <img src="kv_memory_mha_gqa_kvsharing_gemma4_e2b.webp" alt="KV-sharing memory savings for Gemma 4 E2B-like setup" width="800px" />
 
-&nbsp;
+ 
 
 <img src="kv_memory_mha_gqa_kvsharing_gemma4_e4b.webp" alt="KV-sharing memory savings for Gemma 4 E4B-like setup" width="800px" />
 
-&nbsp;
+ 
 
-You can reproduce similar plots via:
+您可以通过以下方式重现类似的图：
 
 ```bash
 uv run plot_memory_estimates_kv_sharing.py --preset gemma4_e2b
 uv run plot_memory_estimates_kv_sharing.py --preset gemma4_e4b
 ```
 
-&nbsp;
-## KV-Sharing Code Examples
+ 
+## KV 共享代码示例
 
-The [gpt_with_kv_mha.py](gpt_with_kv_mha.py) and [gpt_with_kv_sharing.py](gpt_with_kv_sharing.py) scripts in this folder provide hands-on examples for comparing regular MHA with a cross-layer KV-sharing variant.
+此文件夹中的 [gpt_with_kv_mha.py](gpt_with_kv_mha.py) 和 [gpt_with_kv_sharing.py](gpt_with_kv_sharing.py) 脚本提供了比较常规 MHA 与跨层 KV 共享变体的实践示例。
 
-The easiest way to see the implementation details is to inspect a file diff between [gpt_with_kv_mha.py](gpt_with_kv_mha.py) and [gpt_with_kv_sharing.py](gpt_with_kv_sharing.py). The comments are intentionally kept similar so that the diff highlights the KV-sharing changes.
+查看实现细节的最简单方法是检查 [gpt_with_kv_mha.py](gpt_with_kv_mha.py) 和 [gpt_with_kv_sharing.py](gpt_with_kv_sharing.py) 之间的文件差异。注释有意保持相似，以便差异突出 KV 共享更改。
 
-Note that the model is not trained and thus generates nonsensical text. However, you can use it as a drop-in replacement for the standard GPT model in chapters 5-7 and train it.
+请注意，该模型未经训练，因此会生成无意义的文本。但是，您可以使用它作为第 5-7 章中标准 GPT 模型的直接替代品并对其进行训练。
 
-Also, this implementation uses the KV cache explained in [another bonus section](../03_kv-cache), so the memory savings are more pronounced.
+此外，此实现使用了 [另一个奖励部分](../03_kv-cache) 中解释的 KV 缓存，因此内存节省更加明显。
 
 ```bash
 uv run gpt_with_kv_mha.py \
@@ -133,4 +133,4 @@ uv run gpt_with_kv_sharing.py \
 --n_kv_producing_layers 6
 ```
 
-In this small GPT setup, the whole model still contains the same feed-forward layers and output head. The main memory difference is in how many attention layers store K/V tensors in the cache.
+在这个小型 GPT 设置中，整个模型仍然包含相同的前馈层和输出头。主要的内存差异在于有多少个注意力层在缓存中存储 K/V 张量。

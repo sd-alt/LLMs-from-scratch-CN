@@ -1,27 +1,27 @@
-# Qwen3 From Scratch with Chat Interface
+# Qwen3 从头开始，带有聊天界面
 
 
 
-This bonus folder contains code for running a ChatGPT-like user interface to interact with the pretrained Qwen3 model.
+此奖励文件夹包含用于运行类似 ChatGPT 的用户界面以与预训练的 Qwen3 模型进行交互的代码。
 
 
 
-![Chainlit UI example](https://sebastianraschka.com/images/LLMs-from-scratch-images/bonus/qwen/qwen3-chainlit.gif)
+![Chainlit UI 示例](https://sebastianraschka.com/images/LLMs-from-scratch-images/bonus/qwen/qwen3-chainlit.gif)
 
 
 
-To implement this user interface, we use the open-source [Chainlit Python package](https://github.com/Chainlit/chainlit).
+为了实现此用户界面，我们使用开源 [Chainlit Python 包](https://github.com/Chainlit/chainlit)。
 
-&nbsp;
-## Step 1: Install dependencies
+ 
+## 第 1 步：安装依赖项
 
-First, we install the `chainlit` package and dependencies from the [requirements-extra.txt](requirements-extra.txt) list via
+首先，我们通过 [requirements-extra.txt](requirements-extra.txt) 列表安装 `chainlit` 包和依赖项
 
 ```bash
 pip install -r requirements-extra.txt
 ```
 
-Or, if you are using `uv`:
+或者，如果您使用的是 `uv`：
 
 ```bash
 uv pip install -r requirements-extra.txt
@@ -29,27 +29,27 @@ uv pip install -r requirements-extra.txt
 
 
 
-&nbsp;
+ 
 
-## Step 2: Run `app` code
+## 步骤 2：运行 `app` 代码
 
-This folder contains 2 files:
+该文件夹包含2个文件：
 
-1. [`qwen3-chat-interface.py`](qwen3-chat-interface.py): This file loads and uses the Qwen3 0.6B model in thinking mode. 
-2. [`qwen3-chat-interface-multiturn.py`](qwen3-chat-interface-multiturn.py): The same as above, but configured to remember the message history.
+1. [`qwen3-chat-interface.py`](qwen3-chat-interface.py)：该文件在思维模式下加载并使用Qwen3 0.6B模型。
+2. [`qwen3-chat-interface-multiturn.py`](qwen3-chat-interface-multiturn.py)：同上，但配置为记住消息历史记录。
 
-(Open and inspect these files to learn more.)
+（打开并检查这些文件以了解更多信息。）
 
-Run one of the following commands from the terminal to start the UI server:
+从终端运行以下命令之一来启动 UI 服务器：
 
 ```bash
 chainlit run qwen3-chat-interface.py
 ```
 
-or, if you are using `uv`:
+或者，如果您使用的是 `uv`：
 
 ```bash
 uv run chainlit run qwen3-chat-interface.py
 ```
 
-Running one of the commands above should open a new browser tab where you can interact with the model. If the browser tab does not open automatically, inspect the terminal command and copy the local address into your browser address bar (usually, the address is `http://localhost:8000`).
+运行上述命令之一应该会打开一个新的浏览器选项卡，您可以在其中与模型进行交互。如果浏览器选项卡没有自动打开，请检查终端命令并将本地地址复制到浏览器地址栏中（通常该地址为 `http://localhost:8000`）。
