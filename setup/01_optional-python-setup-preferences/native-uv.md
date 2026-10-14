@@ -59,7 +59,9 @@ powershell -c "irm https://astral.sh/uv/install.ps1 | more"
 
 ```bash
 uv sync --dev --python 3.11
-```> **注：**
+```
+
+> **注：**
 > 如果您的系统上没有可用的 Python 3.11，uv 将为您下载并安装它。
 > 我建议使用比最新版本至少早 1-3 个版本的 Python 版本，以确保 PyTorch 兼容性。例如，如果最新版本是Python 3.13，我建议使用版本3.10、3.11、3.12。您可以通过访问 [python.org](https://www.python.org/downloads/) 找到最新的 Python 版本。
 

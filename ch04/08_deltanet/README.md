@@ -24,7 +24,9 @@ Kimi Linear 中的 MLA 不使用门，这是故意的，以便作者可以更直
 
 
  
-## 门控注意力在我们讨论门控 DeltaNet 本身之前，我们先简单谈谈门。正如上图 Qwen3-Next 架构的上半部分所示，Qwen3-Next 使用了“门控注意力”。这本质上是带有附加 s 形门的常规全注意力。
+## 门控注意力
+
+在我们讨论门控 DeltaNet 本身之前，我们先简单谈谈门。正如上图 Qwen3-Next 架构的上半部分所示，Qwen3-Next 使用了“门控注意力”。这本质上是带有附加 s 形门的常规全注意力。
 
 这个门控是一个简单的修改，出于说明目的，我将其添加到下面第 3 章的 `MultiHeadAttention` 代码中：
 
@@ -123,7 +125,9 @@ Delta 规则部分是指计算新值和预测值之间的差异 (delta, Δ)，�
 
 门控 DeltaNet 的门与前面讨论的门控注意力中的门类似，不同之处在于它使用 SiLU 而不是逻辑 sigmoid 激活，如下所示。 （与标准 sigmoid 相比，SiLU 的选择可能会提高梯度流量和稳定性。）
 
-<img src="https://sebastianraschka.com/images/LLMs-from-scratch-images/bonus/gated_deltanet/02.webp" alt="Gated DeltaNet" width=500px>然而，如上图所示，Gated DeltaNet 中的“gate”还指的是几个额外的门：
+<img src="https://sebastianraschka.com/images/LLMs-from-scratch-images/bonus/gated_deltanet/02.webp" alt="Gated DeltaNet" width=500px>
+
+然而，如上图所示，Gated DeltaNet 中的“gate”还指的是几个额外的门：
 
 - `α`（衰减门）控制内存随时间衰减或重置的速度，
 - `β`（更新门）控制新输入修改状态的强度。

@@ -27,9 +27,9 @@ Olmo 3 也有不同的风格，如下所示（架构相同，只是训练管道�
 
 1. 从上图可以看出，Olmo 3架构与Qwen3比较相似。然而，值得注意的是，这本质上很可能是受到 Olmo 2 前身的启发，而不是 Qwen3。
 
-2）与 Olmo 2 类似，Olmo 3 仍然使用 post-norm 风格而不是 pre-norm，因为他们在 Olmo 2 论文中发现它可以稳定训练。
+2) 与 Olmo 2 类似，Olmo 3 仍然使用 post-norm 风格而不是 pre-norm，因为他们在 Olmo 2 论文中发现它可以稳定训练。
 
-3）有趣的是，7B模型仍然使用类似于Olmo 2的多头注意力。
+3) 有趣的是，7B模型仍然使用类似于Olmo 2的多头注意力。
 然而，为了提高效率并减少 KV 缓存大小，他们现在使用滑动窗口注意力（例如，类似于 Gemma 3）。
 
 接下来是32B型号：
@@ -44,4 +44,6 @@ Olmo 3 也有不同的风格，如下所示（架构相同，只是训练管道�
 
 
 
-<br>要了解有关架构差异的更多信息并阅读与其他架构的比较，请参阅我的 [大 LLM 架构比较：从 DeepSeek-V3 到 Kimi K2：现代 LLM 架构设计](https://magazine.sebastianraschka.com/p/the-big-llm-architecture-comparison) 文章。
+<br>
+
+要了解有关架构差异的更多信息并阅读与其他架构的比较，请参阅我的 [大 LLM 架构比较：从 DeepSeek-V3 到 Kimi K2：现代 LLM 架构设计](https://magazine.sebastianraschka.com/p/the-big-llm-architecture-comparison) 文章。

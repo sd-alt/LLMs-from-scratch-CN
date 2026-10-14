@@ -229,7 +229,7 @@ jupyter lab
  
 ## 1.下载并安装Miniforge
 
-从 GitHub 存储库 [（此处](https://github.com/conda-forge/miniforge)）下载 miniforge。
+从 GitHub 存储库 （[此处](https://github.com/conda-forge/miniforge)）下载 miniforge。
 
 <img src="https://sebastianraschka.com/images/LLMs-from-scratch-images/setup/01_optional-python-setup-preferences/download.png" alt="download" width="600px">
 
@@ -243,7 +243,9 @@ sh ~/Desktop/Miniforge3-MacOSX-arm64.sh
 
 其中 `Desktop/` 是 Miniforge 安装程序下载到的文件夹。在您的计算机上，您可能必须将其替换为 `Downloads/`。
 
-<img src="https://sebastianraschka.com/images/LLMs-from-scratch-images/setup/01_optional-python-setup-preferences/miniforge-install.png" alt="miniforge-install" width="600px">接下来，逐步执行下载说明，并按“Enter”键确认。
+<img src="https://sebastianraschka.com/images/LLMs-from-scratch-images/setup/01_optional-python-setup-preferences/miniforge-install.png" alt="miniforge-install" width="600px">
+
+接下来，逐步执行下载说明，并按“Enter”键确认。
 
 
  

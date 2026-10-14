@@ -46,7 +46,9 @@ pip install -r requirements.txt
 
  
 
-## 使用 Docker DevContainers作为上面*设置 Python* 部分的替代方案，如果您更喜欢隔离项目依赖项和配置的开发设置，那么使用 Docker 是一个非常有效的解决方案。这种方法消除了手动安装软件包和库的需要，并确保了一致的开发环境。您可以找到有关设置 Docker 和使用 DevContainer 的更多说明：
+## 使用 Docker DevContainers
+
+作为上面*设置 Python* 部分的替代方案，如果您更喜欢隔离项目依赖项和配置的开发设置，那么使用 Docker 是一个非常有效的解决方案。这种方法消除了手动安装软件包和库的需要，并确保了一致的开发环境。您可以找到有关设置 Docker 和使用 DevContainer 的更多说明：
 
 - [03_可选-docker-环境](03_optional-docker-environment)
 
@@ -94,7 +96,9 @@ mv setup/.vscode ./
 git clone https://github.com/rasbt/LLMs-from-scratch.git
 cd LLMs-from-scratch
 pip install -r requirements.txt
-```（与 Google Colab 相比，这些只需要执行一次，因为 Lightning AI Studio 环境是持久的，即使您在 CPU 和 GPU 机器之间切换也是如此。）
+```
+
+（与 Google Colab 相比，这些只需要执行一次，因为 Lightning AI Studio 环境是持久的，即使您在 CPU 和 GPU 机器之间切换也是如此。）
 
 然后，导航到要运行的 Python 脚本或 Jupyter Notebook。或者，您还可以轻松连接 GPU 以加速代码的运行时间，例如，当您在第 5 章中预训练 LLM 或在第 6 章和第 7 章中对其进行微调时。
 

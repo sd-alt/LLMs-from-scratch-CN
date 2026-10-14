@@ -99,7 +99,9 @@ uv run gpt_with_kv_dsa.py \
 | `--topk` | 64 | 64每个查询涉及的令牌数量 (k)。对于短序列，以序列长度为上限。 |
 
  
-## 与 DeepSeek V3.2 的关系完整的 DeepSeek-V3.2 模型使用多头潜在注意力（MLA，请参阅 [../05_mla](../05_mla)）和 DSA，并且索引器查询源自共享的压缩潜在表示而不是原始输入。 DeepSeek-V3.2 使用与 DeepSeek-V3.2-Exp 相同的架构，其中首次引入并测试了 DSA。
+## 与 DeepSeek V3.2 的关系
+
+完整的 DeepSeek-V3.2 模型使用多头潜在注意力（MLA，请参阅 [../05_mla](../05_mla)）和 DSA，并且索引器查询源自共享的压缩潜在表示而不是原始输入。 DeepSeek-V3.2 使用与 DeepSeek-V3.2-Exp 相同的架构，其中首次引入并测试了 DSA。
 
 这里再现了关键选择的想法。一个廉价的学习点积评分器将每个查询限制在注意力 softmax 之前最相关的标记。
 

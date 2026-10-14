@@ -33,7 +33,9 @@
  
 ### 基线
 
-请注意，`00_orig.py` 服务器作为基线，不包含任何重大修改，并使用第 5 章中的代码，除了以下内容之外：- 上下文长度增加了 4 倍（这解释了与第 5 章相比 `00_orig.py` 的内存占用相对较大）；
+请注意，`00_orig.py` 服务器作为基线，不包含任何重大修改，并使用第 5 章中的代码，除了以下内容之外：
+
+- 上下文长度增加了 4 倍（这解释了与第 5 章相比 `00_orig.py` 的内存占用相对较大）；
 - 4倍批量大小变化（`00_orig.py`内存占用相对较大的另一个原因）；
 - 一本更大的公共领域书籍，以增加训练数据的大小。
 
@@ -145,7 +147,9 @@ Reserved memory: 26.2617 GB
 - `Reserved memory: 11.5645 GB`
 
  
-### 7. 使用 FlashAttention- 将 PyTorch 的自注意力函数与 FlashAttention 结合使用，而不是我们从头开始的多头注意力实现。
+### 7. 使用 FlashAttention
+
+- 将 PyTorch 的自注意力函数与 FlashAttention 结合使用，而不是我们从头开始的多头注意力实现。
 
 
 之前：
@@ -189,7 +193,9 @@ Reserved memory: 26.2617 GB
 ---
 
  
-### 9.词汇填充- 在这里，我们将词汇量从 50,257 稍微增加到 50,304，这是最接近的 64 的倍数。这个技巧是我的前同事 Carlos Mocholi 向我建议的，他提到它最初来自 Andrej Karpathy（可能来自 [这篇文章](https://x.com/karpathy/status/1621578354024677377)）。 Karpathy 的建议基于与 PyTorch 团队的互动，PyTorch 团队就 [Bertrand Maher](https://www.linkedin.com/feed/update/urn:li:activity:7309569006057795584?commentUrn=urn%3Ali%3Acomment%3A%28activity%3A7309569006057795584%2C7309754284185669632%29&dashCommentUrn=urn%3Ali%3Afsd_comment%3A%287309754284185669632%2Curn%3Ali%3Aactivity%3A7309569006057795584%29) 提到的 `torch.compile` 提供了建议。 [NVIDIA 关于张量形状的指南](https://docs.nvidia.com/deeplearning/performance/mixed-precision-training/index.html#tensor-core-shape) 是一个很好的资源，其中批量大小和线性层尺寸通常选择为某些值的倍数。此外，NVIDIA 的 Megatron 团队很早之前就描述过词汇填充技巧（参见 2019 年 [Megatron-LM：使用模型并行性训练数十亿参数语言模型](https://arxiv.org/abs/1909.08053) 论文）。
+### 9.词汇填充
+
+- 在这里，我们将词汇量从 50,257 稍微增加到 50,304，这是最接近的 64 的倍数。这个技巧是我的前同事 Carlos Mocholi 向我建议的，他提到它最初来自 Andrej Karpathy（可能来自 [这篇文章](https://x.com/karpathy/status/1621578354024677377)）。 Karpathy 的建议基于与 PyTorch 团队的互动，PyTorch 团队就 [Bertrand Maher](https://www.linkedin.com/feed/update/urn:li:activity:7309569006057795584?commentUrn=urn%3Ali%3Acomment%3A%28activity%3A7309569006057795584%2C7309754284185669632%29&dashCommentUrn=urn%3Ali%3Afsd_comment%3A%287309754284185669632%2Curn%3Ali%3Aactivity%3A7309569006057795584%29) 提到的 `torch.compile` 提供了建议。 [NVIDIA 关于张量形状的指南](https://docs.nvidia.com/deeplearning/performance/mixed-precision-training/index.html#tensor-core-shape) 是一个很好的资源，其中批量大小和线性层尺寸通常选择为某些值的倍数。此外，NVIDIA 的 Megatron 团队很早之前就描述过词汇填充技巧（参见 2019 年 [Megatron-LM：使用模型并行性训练数十亿参数语言模型](https://arxiv.org/abs/1909.08053) 论文）。
 
 之前：
 - `Step tok/sec: 112046`

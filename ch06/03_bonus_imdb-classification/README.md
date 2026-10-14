@@ -95,7 +95,9 @@ Evaluating on the full datasets ...
 Training accuracy: 97.45%
 Validation accuracy: 92.52%
 Test accuracy: 92.40%
-```观察：Muon 似乎优化得更好/更快，但这也导致了这里训练集的过度拟合。
+```
+
+观察：Muon 似乎优化得更好/更快，但这也导致了这里训练集的过度拟合。
 
 PS：训练时间无法直接比较，因为这是在不同的 GPU 上运行的。
 

@@ -1,6 +1,6 @@
 # 构建大型语言模型（从头开始）
 
-该存储库包含用于开发、预训练和微调类似 GPT 的 LLM 的代码，并且是《[构建大型语言模型（从头开始）》](https://amzn.to/4fqvn0D) 书籍的官方代码存储库。
+该存储库包含用于开发、预训练和微调类似 GPT 的 LLM 的代码，并且是[《构建大型语言模型（从头开始）》](https://amzn.to/4fqvn0D) 书籍的官方代码存储库。
 
 <br>
 <br>
@@ -45,7 +45,9 @@ git clone --depth 1 https://github.com/rasbt/LLMs-from-scratch.git
 您也可以在浏览器中通过 [https://github.com/rasbt/LLMs-from-scratch](https://github.com/rasbt/LLMs-from-scratch) 查看 GitHub 上的此文件和其他文件，这会自动呈现 Markdown。
 
 <br>
-<br>> **提示：**
+<br>
+
+> **提示：**
 > 如果您正在寻求有关安装 Python 和 Python 包以及设置代码环境的指导，我建议您阅读位于 [设置](setup) 目录中的 [README.md](setup/README.md) 文件。
 
 <br>
@@ -55,7 +57,9 @@ git clone --depth 1 https://github.com/rasbt/LLMs-from-scratch.git
 [![代码测试 Windows](https://github.com/rasbt/LLMs-from-scratch/actions/workflows/basic-tests-windows-uv-pip.yml/badge.svg)](https://github.com/rasbt/LLMs-from-scratch/actions/workflows/basic-tests-windows-uv-pip.yml)
 [![代码测试 macOS](https://github.com/rasbt/LLMs-from-scratch/actions/workflows/basic-tests-macos-uv.yml/badge.svg)](https://github.com/rasbt/LLMs-from-scratch/actions/workflows/basic-tests-macos-uv.yml)
 
-- [故障排除指南](./troubleshooting.md)|章节标题 |主代码（用于快速访问）|所有代码+补充|
+- [故障排除指南](./troubleshooting.md)
+
+|章节标题 |主代码（用于快速访问）|所有代码+补充|
 |------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------|
 | [设置建议](setup) <br/>[如何最好地阅读本书](https://sebastianraschka.com/blog/2025/reading-books.html) | - | - |
 |第 1 章：理解大型语言模型 |没有代码 | - |
@@ -69,7 +73,9 @@ git clone --depth 1 https://github.com/rasbt/LLMs-from-scratch.git
 |附录 B：参考资料和延伸阅读 |没有代码 | [./附录-B](./appendix-B) |
 |附录 C：练习解决方案 | - [锻炼解决方案列表](appendix-C) | [./附录-C](./appendix-C) |
 |附录 D：在训练循环中添加附加功能 | - [附录-D.ipynb](appendix-D/01_main-chapter-code/appendix-D.ipynb) | [./附录-D](./appendix-D) |
-|附录 E：使用 LoRA 进行参数高效的微调 | - [附录-E.ipynb](appendix-E/01_main-chapter-code/appendix-E.ipynb) | [./附录-E](./appendix-E) |<br>
+|附录 E：使用 LoRA 进行参数高效的微调 | - [附录-E.ipynb](appendix-E/01_main-chapter-code/appendix-E.ipynb) | [./附录-E](./appendix-E) |
+
+<br>
  
 
 下面的思维模型总结了本书所涵盖的内容。
@@ -151,7 +157,9 @@ git clone --depth 1 https://github.com/rasbt/LLMs-from-scratch.git
 
 - **第 3 章：编码注意力机制**
   - [比较高效的多头注意力实现](ch03/02_bonus_efficient-multihead-attention/mha-implementations.ipynb)
-  - [了解 PyTorch 缓冲区](ch03/03_understanding-buffers/understanding-buffers.ipynb)- **第 4 章：从头开始实现 GPT 模型**
+  - [了解 PyTorch 缓冲区](ch03/03_understanding-buffers/understanding-buffers.ipynb)
+
+- **第 4 章：从头开始实现 GPT 模型**
   - [FLOPs 分析](ch04/02_performance-analysis/flops-analysis.ipynb)
   - [KV 缓存](ch04/03_kv-cache)
   - [注意替代方案](ch04/#attention-alternatives)
@@ -161,7 +169,9 @@ git clone --depth 1 https://github.com/rasbt/LLMs-from-scratch.git
     - [门控 DeltaNet](ch04/08_deltanet)
     - [DeepSeek 稀疏注意力 (DSA)](ch04/09_dsa)
     - [跨层KV共享](ch04/10_kv-sharing)
-  - [混合专家 (MoE)](ch04/07_moe)- **第 5 章：未标记数据的预训练**
+  - [混合专家 (MoE)](ch04/07_moe)
+
+- **第 5 章：未标记数据的预训练**
   - [替代重量加载方法](ch05/02_alternative_weight_loading/)
   - [在古腾堡项目数据集](ch05/03_bonus_pretraining_on_gutenberg) 上预训练 GPT
   - [在训练循环中添加附加功能](ch05/04_learning_rate_schedulers)
@@ -191,7 +201,9 @@ git clone --depth 1 https://github.com/rasbt/LLMs-from-scratch.git
   - [改进指令微调的数据集](ch07/05_dataset-generation/reflection-gpt4.ipynb)
   - [使用 Llama 3.1 70B 和 Ollama](ch07/04_preference-tuning-with-dpo/create-preference-data-ollama.ipynb) 生成偏好数据集
   - [LLM对齐的直接偏好优化（DPO）](ch07/04_preference-tuning-with-dpo/dpo-from-scratch.ipynb)
-  - [构建用户界面以与指令微调 GPT 模型](ch07/06_user_interface) 交互来自 [从头开始推理](https://github.com/rasbt/reasoning-from-scratch) 存储库的更多奖励材料：
+  - [构建用户界面以与指令微调 GPT 模型](ch07/06_user_interface) 交互
+
+来自 [从头开始推理](https://github.com/rasbt/reasoning-from-scratch) 存储库的更多奖励材料：
 
 - **Qwen3（从头开始）基础知识**
   - [Qwen3 源代码演练](https://github.com/rasbt/reasoning-from-scratch/blob/main/chC/01_main-chapter-code/chC_main.ipynb)

@@ -28,4 +28,6 @@
 
 <img src="https://sebastianraschka.com/images/LLMs-from-scratch-images/bonus/gemma3/gemma3-vs-qwen3.webp">
 
-<br>要了解有关架构差异的更多信息并阅读与其他架构的比较，请参阅我的 [大 LLM 架构比较：从 DeepSeek-V3 到 Kimi K2：现代 LLM 架构设计](https://magazine.sebastianraschka.com/p/the-big-llm-architecture-comparison) 文章。
+<br>
+
+要了解有关架构差异的更多信息并阅读与其他架构的比较，请参阅我的 [大 LLM 架构比较：从 DeepSeek-V3 到 Kimi K2：现代 LLM 架构设计](https://magazine.sebastianraschka.com/p/the-big-llm-architecture-comparison) 文章。

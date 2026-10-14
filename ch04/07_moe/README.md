@@ -94,7 +94,9 @@ uv run plot_memory_estimates_moe.py \
 
 
  
-## 教育部代码示例此文件夹中的 [gpt_with_kv_ffn.py](gpt_with_kv_ffn.py) 和 [gpt_with_kv_moe.py](gpt_with_kv_moe.py) 脚本提供了在 GPT 模型实现的上下文中比较常规 FFN 和 MoE 内存使用情况的实践示例。请注意，两个脚本都使用 [SwiGLU](https://arxiv.org/abs/2002.05202) 前馈模块，如本页第一张图所示（GPT-2 传统上使用 GELU）。
+## 教育部代码示例
+
+此文件夹中的 [gpt_with_kv_ffn.py](gpt_with_kv_ffn.py) 和 [gpt_with_kv_moe.py](gpt_with_kv_moe.py) 脚本提供了在 GPT 模型实现的上下文中比较常规 FFN 和 MoE 内存使用情况的实践示例。请注意，两个脚本都使用 [SwiGLU](https://arxiv.org/abs/2002.05202) 前馈模块，如本页第一张图所示（GPT-2 传统上使用 GELU）。
 
 **注意：该模型未经训练，因此会生成无意义的文本。您可以在奖励材料中找到经过培训的 MoE：[../../ch05/11_qwen3/standalone-qwen3-moe-plus-kvcache.ipynb](../../ch05/11_qwen3/standalone-qwen3-moe-plus-kvcache.ipynb)。**
 

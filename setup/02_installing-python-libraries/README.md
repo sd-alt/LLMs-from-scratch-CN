@@ -65,7 +65,9 @@ pip install torch
 
 
  
-## JupyterLab 提示如果您在 JupyterLab 而不是 VSCode 中查看笔记本代码，请注意 JupyterLab（默认设置）在最新版本中存在滚动错误。我的建议是转到“设置”->“设置编辑器”并将“窗口模式”更改为“无”（如下图所示），这似乎可以解决该问题。
+## JupyterLab 提示
+
+如果您在 JupyterLab 而不是 VSCode 中查看笔记本代码，请注意 JupyterLab（默认设置）在最新版本中存在滚动错误。我的建议是转到“设置”->“设置编辑器”并将“窗口模式”更改为“无”（如下图所示），这似乎可以解决该问题。
 
 
 ![Jupyter 故障 1](https://sebastianraschka.com/images/reasoning-from-scratch-images/bonus/setup/jupyter_glitching_1.webp)

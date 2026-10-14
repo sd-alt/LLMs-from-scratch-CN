@@ -60,7 +60,9 @@ pixi add python=3.10
 
 ```bash
 pixi install
-```> **注：**
+```
+
+> **注：**
 > 如果您遇到依赖项问题（例如，如果您使用的是 Windows），您可以随时回退到 pip：`pixi run pip install -U -r requirements.txt`
 
 默认情况下，`pixi install` 将创建一个特定于项目的单独虚拟环境。

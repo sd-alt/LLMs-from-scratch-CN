@@ -42,7 +42,9 @@ cd LLMs-from-scratch
 git remote add upstream https://github.com/rasbt/LLMs-from-scratch.git
 git fetch upstream
 git merge upstream/main
-```如果您确实需要合并已编辑的笔记本，请考虑安装 [`nbdime`](https://nbdime.readthedocs.io/) 以获得笔记本感知的差异和合并工具：
+```
+
+如果您确实需要合并已编辑的笔记本，请考虑安装 [`nbdime`](https://nbdime.readthedocs.io/) 以获得笔记本感知的差异和合并工具：
 
 ```bash
 pip install nbdime

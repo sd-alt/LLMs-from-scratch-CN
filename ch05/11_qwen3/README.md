@@ -71,7 +71,9 @@ TOP_K = 1
  
 #### 3a) 0.6B模型的权重下载和加载
 
-下面根据上面的模型选择（推理或基础）自动下载权重文件。请注意，本节重点介绍 0.6B 模型。如果您想使用任何较大的模型（1.7B、4B、8B 或 32B），请跳过本节并继续执行第 3b) 节。```python
+下面根据上面的模型选择（推理或基础）自动下载权重文件。请注意，本节重点介绍 0.6B 模型。如果您想使用任何较大的模型（1.7B、4B、8B 或 32B），请跳过本节并继续执行第 3b) 节。
+
+```python
 from llms_from_scratch.qwen3 import download_from_huggingface
 
 repo_id = "rasbt/qwen3-from-scratch"
@@ -317,8 +319,8 @@ model = torch.compile(model)
 
 |                          |硬件|令牌/秒 |内存|
 | ------------------------ | ----------------|------------------------ | -------- |
-| Qwen3Model 0.6B | Nvidia A100 GPU | 25 | 25 1.49 GB | 1.49 GB
-| Qwen3Model 0.6B编译| Nvidia A100 GPU | 107 | 107 1.99 GB | 1.99 GB
+| Qwen3Model 0.6B | Nvidia A100 GPU | 25 | 1.49 GB |
+| Qwen3Model 0.6B编译| Nvidia A100 GPU | 107 | 1.99 GB |
 
 
  
@@ -338,24 +340,26 @@ token_ids = generate_text_simple(
     max_new_tokens=MAX_NEW_TOKENS,
     context_size=QWEN_CONFIG_06_B["context_length"],
 )
-```请注意，峰值内存使用量仅针对 Nvidia CUDA 设备列出，因为它更容易计算。然而，其他设备上的内存使用情况可能相似，因为它使用类似的精度格式，并且 KV 缓存存储导致生成的 150 个令牌文本的内存使用量甚至更低（但是，不同的设备可能以不同的方式实现矩阵乘法，并可能导致不同的峰值内存需求；并且 KV 缓存内存可能会因较长的上下文长度而大幅增加）。
+```
+
+请注意，峰值内存使用量仅针对 Nvidia CUDA 设备列出，因为它更容易计算。然而，其他设备上的内存使用情况可能相似，因为它使用类似的精度格式，并且 KV 缓存存储导致生成的 150 个令牌文本的内存使用量甚至更低（但是，不同的设备可能以不同的方式实现矩阵乘法，并可能导致不同的峰值内存需求；并且 KV 缓存内存可能会因较长的上下文长度而大幅增加）。
 
 |型号|模式|硬件|令牌/秒 | GPU 内存 (VRAM) |
 | ---------------- | ----------------- | ---------------- | ---------- | ----------------- |
 | Qwen3Model 0.6B |常规| Mac Mini M4 CPU | 1 | - |
 | Qwen3Model 0.6B |常规编译| Mac Mini M4 CPU | 1 | - |
 | Qwen3Model 0.6B | KV缓存| Mac Mini M4 CPU | 80| - |
-| Qwen3Model 0.6B | KV缓存编译| Mac Mini M4 CPU | 137 | 137 - |
+| Qwen3Model 0.6B | KV缓存编译| Mac Mini M4 CPU | 137 | - |
 |                 |                   |                 |            |                   |
-| Qwen3Model 0.6B |常规| Mac Mini M4 GPU | 21 | 21 - |
+| Qwen3Model 0.6B |常规| Mac Mini M4 GPU | 21 | - |
 | Qwen3Model 0.6B |常规编译| Mac Mini M4 GPU |错误| - |
-| Qwen3Model 0.6B | KV缓存| Mac Mini M4 GPU | 28 | 28 - |
+| Qwen3Model 0.6B | KV缓存| Mac Mini M4 GPU | 28 | - |
 | Qwen3Model 0.6B | KV缓存编译| Mac Mini M4 GPU |错误| - |
 |                 |                   |                 |            |                   |
-| Qwen3Model 0.6B |常规| Nvidia A100 GPU | 26 | 26 1.49 GB | 1.49 GB
-| Qwen3Model 0.6B |常规编译| Nvidia A100 GPU | 107 | 107 1.99 GB | 1.99 GB
-| Qwen3Model 0.6B | KV缓存| Nvidia A100 GPU | 25 | 25 1.47 GB | 1.47 GB
-| Qwen3Model 0.6B | KV缓存编译| Nvidia A100 GPU | 90 | 90 1.48 GB | 1.48 GB
+| Qwen3Model 0.6B |常规| Nvidia A100 GPU | 26 | 1.49 GB |
+| Qwen3Model 0.6B |常规编译| Nvidia A100 GPU | 107 | 1.99 GB |
+| Qwen3Model 0.6B | KV缓存| Nvidia A100 GPU | 25 | 1.47 GB |
+| Qwen3Model 0.6B | KV缓存编译| Nvidia A100 GPU | 90 | 1.48 GB |
 
 请注意，上述所有设置都经过测试，可产生相同的文本输出。
 
@@ -412,15 +416,15 @@ from llms_from_scratch.kv_cache_batched.qwen3 import Qwen3Model
 | ---------------- | ----------------- | ---------------- | ---------- | ---------- | ----------------- |
 | Qwen3Model 0.6B |常规| Mac Mini M4 CPU | 8 | 2 | - |
 | Qwen3Model 0.6B |常规编译| Mac Mini M4 CPU | 8 | - | - |
-| Qwen3Model 0.6B | KV缓存| Mac Mini M4 CPU | 8 | 92 | 92 - |
-| Qwen3Model 0.6B | KV缓存编译| Mac Mini M4 CPU | 8 | 128 | 128 - |
+| Qwen3Model 0.6B | KV缓存| Mac Mini M4 CPU | 8 | 92 | - |
+| Qwen3Model 0.6B | KV缓存编译| Mac Mini M4 CPU | 8 | 128 | - |
 |                  |                   |                 |            |            |                   |
-| Qwen3Model 0.6B |常规| Mac Mini M4 GPU | 8 | 36 | 36 - |
+| Qwen3Model 0.6B |常规| Mac Mini M4 GPU | 8 | 36 | - |
 | Qwen3Model 0.6B |常规编译| Mac Mini M4 GPU | 8 | - | - |
-| Qwen3Model 0.6B | KV缓存| Mac Mini M4 GPU | 8 | 61 | 61 - |
+| Qwen3Model 0.6B | KV缓存| Mac Mini M4 GPU | 8 | 61 | - |
 | Qwen3Model 0.6B | KV缓存编译| Mac Mini M4 GPU | 8 | - | - |
 |                  |                   |                 |            |            |                   |
-| Qwen3Model 0.6B |常规| Nvidia A100 GPU | 8 | 184 | 184 2.19 GB | 2.19 GB
-| Qwen3Model 0.6B |常规编译| Nvidia A100 GPU | 8 | 351 | 351 2.19 GB | 2.19 GB
-| Qwen3Model 0.6B | KV缓存| Nvidia A100 GPU | 8 | 140 | 140 3.13 GB | 3.13 GB
-| Qwen3Model 0.6B | KV缓存编译| Nvidia A100 GPU | 8 | 280 | 280 1.75 GB | 1.75 GB
+| Qwen3Model 0.6B |常规| Nvidia A100 GPU | 8 | 184 | 2.19 GB |
+| Qwen3Model 0.6B |常规编译| Nvidia A100 GPU | 8 | 351 | 2.19 GB |
+| Qwen3Model 0.6B | KV缓存| Nvidia A100 GPU | 8 | 140 | 3.13 GB |
+| Qwen3Model 0.6B | KV缓存编译| Nvidia A100 GPU | 8 | 280 | 1.75 GB |

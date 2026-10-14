@@ -43,7 +43,9 @@
 
 a.打开 [`gpt_with_kv_cache.py`](gpt_with_kv_cache.py) 文件并查找标记新更改的 `# NEW` 部分：
 
-<img src="https://sebastianraschka.com/images/LLMs-from-scratch-images/bonus/kv-cache/new-sections.png?3" width=800>b.通过您选择的文件比较工具检查两个代码文件以比较更改：
+<img src="https://sebastianraschka.com/images/LLMs-from-scratch-images/bonus/kv-cache/new-sections.png?3" width=800>
+
+b.通过您选择的文件比较工具检查两个代码文件以比较更改：
 
 <img src="https://sebastianraschka.com/images/LLMs-from-scratch-images/bonus/kv-cache/file-diff.png?3" width=800>
 
@@ -201,7 +203,9 @@ def generate_text_simple_cached(model, idx, max_new_tokens,
 
 ## 简单的性能比较
 
-在概念层面上介绍了 KV 缓存之后，最大的问题是它在一个小示例的实践中实际表现如何。为了尝试实现，我们可以将上述两个代码文件作为 Python 脚本运行，这将运行小型 124 M 参数 LLM 来生成 200 个新令牌（以 4 个令牌提示符“Hello，I am”开始）：```bash
+在概念层面上介绍了 KV 缓存之后，最大的问题是它在一个小示例的实践中实际表现如何。为了尝试实现，我们可以将上述两个代码文件作为 Python 脚本运行，这将运行小型 124 M 参数 LLM 来生成 200 个新令牌（以 4 个令牌提示符“Hello，I am”开始）：
+
+```bash
 pip install -r https://raw.githubusercontent.com/rasbt/LLMs-from-scratch/refs/heads/main/requirements.txt
 
 python gpt_ch04.py
@@ -213,8 +217,8 @@ python gpt_with_kv_cache.py
 
 |                        |令牌/秒 |
 | ---------------------- | ---------- |
-| `gpt_ch04.py` | 27 | 27
-| `gpt_with_kv_cache.py` | 144 | 144
+| `gpt_ch04.py` | 27 |
+| `gpt_with_kv_cache.py` | 144 |
 
 因此，正如我们所看到的，我们已经通过 124 M 的小型参数模型和较短的 200 个令牌序列长度获得了大约 5 倍的加速。 （请注意，此实现针对代码可读性进行了优化，并未针对 CUDA 或 MPS 运行时速度进行优化，这需要预先分配张量，而不是恢复和连接它们。）
 
@@ -240,7 +244,9 @@ python gpt_with_kv_cache.py
 
 
  
-## 优化KV缓存实现虽然我上面对 KV 缓存的概念实现有助于提高清晰度，并且主要面向代码可读性和教育目的，但将其部署在现实场景中（尤其是较大的模型和较长的序列长度）需要更仔细的优化。
+## 优化KV缓存实现
+
+虽然我上面对 KV 缓存的概念实现有助于提高清晰度，并且主要面向代码可读性和教育目的，但将其部署在现实场景中（尤其是较大的模型和较长的序列长度）需要更仔细的优化。
 
  
 ### 扩展缓存时的常见陷阱
@@ -286,9 +292,9 @@ cache_v = cache_v[:, :, -window_size:, :]
 
 |                                  |令牌/秒 |
 | -------------------------------- | ---------- |
-| `gpt_ch04.py` | 27 | 27
-| `gpt_with_kv_cache.py` | 144 | 144
-| `gpt_with_kv_cache_optimized.py` | 166 | 166
+| `gpt_ch04.py` | 27 |
+| `gpt_with_kv_cache.py` | 144 |
+| `gpt_with_kv_cache_optimized.py` | 166 |
 
 不幸的是，速度优势在 CUDA 设备上消失了，因为这是一个小型模型，并且设备传输和通信超过了该小型模型的 KV 缓存的优势。
 

@@ -43,12 +43,12 @@ cd gutenberg
 pip install -r requirements.txt
 ```
 
-5.下载数据：
+5. 下载数据：
 ```bash
 python get_data.py
 ```
 
-6.返回`03_bonus_pretraining_on_gutenberg`文件夹
+6. 返回`03_bonus_pretraining_on_gutenberg`文件夹
 ```bash
 cd ..
 ```
@@ -157,12 +157,14 @@ python -u pretraining_simple.py | tee log.txt
  
 ## 设计决策和改进
 
-请注意，此代码的重点是为了教育目的而保持简单和最小化。可以通过以下方式改进代码，以提高建模性能和训练效率：1. 修改 `prepare_dataset.py` 脚本以从每个书籍文件中删除古腾堡样板文本。
+请注意，此代码的重点是为了教育目的而保持简单和最小化。可以通过以下方式改进代码，以提高建模性能和训练效率：
+
+1. 修改 `prepare_dataset.py` 脚本以从每个书籍文件中删除古腾堡样板文本。
 2. 更新数据准备和加载实用程序以对数据集进行预标记并将其保存为标记化形式，以便每次调用预训练脚本时不必重新标记化。
 3. 通过添加 [附录 D：向训练循环添加附加功能](../../appendix-D/01_main-chapter-code/appendix-D.ipynb) 中介绍的功能来更新 `train_model_simple` 脚本，即余弦衰减、线性预热和梯度裁剪。
 4. 更新预训练脚本以保存优化器状态（请参阅第 5 章中的 *5.4 在 PyTorch* 中加载和保存权重部分；[ch05.ipynb](../../ch05/01_main-chapter-code/ch05.ipynb)），并添加用于加载现有模型和优化器检查点的选项，并在训练运行中断时继续训练。
 5. 添加更高级的记录器（例如权重和偏差）以实时查看损失和验证曲线
 6. 添加分布式数据并行性 (DDP) 并在多个 GPU 上训练模型（请参阅附录 A 中的*A.9.3 使用多个 GPU 进行训练*部分；[DDP-script.py](../../appendix-A/01_main-chapter-code/DDP-script.py)）。
 7. 将 `previous_chapter.py` 脚本中从头开始的 `MultiheadAttention` 类替换为 [高效多头注意力实现](../../ch03/02_bonus_efficient-multihead-attention/mha-implementations.ipynb) 奖励部分中实现的高效 `MHAPyTorchScaledDotProduct` 类，该部分通过 PyTorch 的 `nn.functional.scaled_dot_product_attention` 函数使用 Flash Attention。
-8.通过[torch.compile](https://pytorch.org/tutorials/intermediate/torch_compile_tutorial.html)（`model = torch.compile`）或[雷霆](https://github.com/Lightning-AI/lightning-thunder)（`model = thunder.jit(model)`）优化模型来加速训练。
+8. 通过[torch.compile](https://pytorch.org/tutorials/intermediate/torch_compile_tutorial.html)（`model = torch.compile`）或[雷霆](https://github.com/Lightning-AI/lightning-thunder)（`model = thunder.jit(model)`）优化模型来加速训练。
 9. 实施梯度低阶投影（GaLore）以进一步加快预训练过程。只需将 `AdamW` 优化器替换为 [GaLore Python 库](https://github.com/jiaweizzhao/GaLore) 中提供的 `GaLoreAdamW` 即可实现此目的。
